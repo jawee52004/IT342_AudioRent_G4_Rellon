@@ -1,5 +1,6 @@
 package com.AudioRent.backend.controller;
 
+import com.AudioRent.backend.dto.RegisterRequest;
 import com.AudioRent.backend.model.User;
 import com.AudioRent.backend.service.AuthService;
 import org.springframework.http.ResponseEntity;
@@ -19,27 +20,21 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Map<String, String> request) {
-        try {
-            String fullName = request.get("fullName");
-            String email = request.get("email");
-            String password = request.get("password");
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request)
+            throws Exception {
 
-            if (fullName == null || email == null || password == null) {
-                return ResponseEntity.badRequest().body("Missing required fields");
-            }
+        User user = authService.register(
+                request.getFullName(),
+                request.getEmail(),
+                request.getPassword(),
+                request.getRole()
+        );
 
-            User newUser = authService.register(fullName, email, password);
-            return ResponseEntity.ok(Map.of(
-                    "id", newUser.getId(),
-                    "fullName", newUser.getFullName(),
-                    "email", newUser.getEmail()
-            ));
-        } catch (ExecutionException | InterruptedException e) {
-            return ResponseEntity.internalServerError().body("Database error");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        if (user.getFullName() == null || user.getEmail() == null || user.getPasswordHash() == null || user.getRole() == null) {
+            return ResponseEntity.badRequest().body("Missing required fields");
         }
+
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("/login")

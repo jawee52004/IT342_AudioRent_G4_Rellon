@@ -1,4 +1,4 @@
-// src/pages/Register.tsx
+// src/pages/.tsx
 import React, { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom"; // <-- for navigation
@@ -9,6 +9,7 @@ const Register: React.FC = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [role, setRole] = useState("");
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +20,8 @@ const Register: React.FC = () => {
       const response = await axios.post("http://localhost:8080/auth/register", {
         fullName,
         email,
-        password
+        password,
+        role
       });
 
       console.log("Register response:", response.data);
@@ -61,6 +63,20 @@ const Register: React.FC = () => {
             required
             style={{ width: "100%" }}
           />
+        </div>
+
+        <div style={{ marginBottom: "10px" }}>
+          <label>Role:</label>
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            required
+            style={{ width: "100%" }}
+          >
+            <option value="">Select role</option>
+            <option value="CUSTOMER">Customer (Renter)</option>
+            <option value="PROVIDER">Provider (Lessor)</option>
+          </select>
         </div>
 
         <div style={{ marginBottom: "10px" }}>

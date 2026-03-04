@@ -1,5 +1,6 @@
 package com.AudioRent.backend.service;
 
+import com.AudioRent.backend.model.Role;
 import com.AudioRent.backend.model.User;
 import com.AudioRent.backend.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,19 +22,32 @@ public class AuthService {
         this.passwordEncoder = new BCryptPasswordEncoder(); // hashing passwords
     }
 
-    public User register(String fullName, String email, String password) throws ExecutionException, InterruptedException {
+    public String validateRole(String role){
+        if (role == null) {
+            return "CUSTOMER";
+        }
+
+        role = role.toUpperCase();
+
+        if (!role.equals("CUSTOMER") && !role.equals("PROVIDER")) {
+            throw new RuntimeException("Invalid role selected");
+        }
+
+        return role;
+    }
+
+    public User register(String fullName, String email, String password, Role role) throws ExecutionException, InterruptedException {
         // Check if email exists
         Optional<User> existingUser = userRepository.findByEmail(email);
         if (existingUser.isPresent()) {
             throw new RuntimeException("Email is already registered");
         }
-
         // Create new user
         User user = User.builder()
                 .fullName(fullName)
                 .email(email)
                 .passwordHash(passwordEncoder.encode(password))
-                .role("CUSTOMER") // default role
+                .role(role) // default role
                 .isActive(true)
                 .createdAt(com.google.cloud.Timestamp.now())
                 .build();

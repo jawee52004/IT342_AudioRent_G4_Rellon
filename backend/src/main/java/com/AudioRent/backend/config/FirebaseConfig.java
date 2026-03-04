@@ -3,31 +3,23 @@ package com.AudioRent.backend.config;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Configuration;
 
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
-import java.io.InputStream;
 
 @Configuration
 public class FirebaseConfig {
 
     @PostConstruct
-    public void init() throws IOException {
-
-        // Load the JSON from the resources folder via classpath
-        InputStream serviceAccount = getClass().getClassLoader()
-                .getResourceAsStream("firebase-service-account.json");
-
-        if (serviceAccount == null) {
-            throw new IOException("firebase-service-account.json not found in resources!");
-        }
-
-        FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .build();
+    public void initialize() throws IOException {
 
         if (FirebaseApp.getApps().isEmpty()) {
+
+            FirebaseOptions options = FirebaseOptions.builder()
+                    .setCredentials(GoogleCredentials.getApplicationDefault())
+                    .build();
+
             FirebaseApp.initializeApp(options);
         }
     }
