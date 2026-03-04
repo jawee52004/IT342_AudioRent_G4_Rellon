@@ -1,7 +1,7 @@
 package com.AudioRent.backend.model;
 
 import lombok.*;
-import java.time.Instant;
+import com.google.cloud.Timestamp;
 
 @Data
 @Builder
@@ -15,5 +15,5 @@ public class User {
     private String fullName;
     private String role;
     private Boolean isActive;
-    private Instant createdAt;
+    private Timestamp createdAt;
 }

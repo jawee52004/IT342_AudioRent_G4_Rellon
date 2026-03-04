@@ -35,7 +35,7 @@ public class AuthService {
                 .passwordHash(passwordEncoder.encode(password))
                 .role("CUSTOMER") // default role
                 .isActive(true)
-                .createdAt(Instant.now())
+                .createdAt(com.google.cloud.Timestamp.now())
                 .build();
 
         return userRepository.save(user);
@@ -48,6 +48,10 @@ public class AuthService {
         }
 
         User user = userOpt.get();
+
+        System.out.println("Entered password: " + password);
+        System.out.println("Stored hash: " + user.getPasswordHash());
+        System.out.println("Match result: " + passwordEncoder.matches(password, user.getPasswordHash()));
 
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
             throw new RuntimeException("Invalid credentials");
