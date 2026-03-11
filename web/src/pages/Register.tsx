@@ -24,19 +24,19 @@ const Register: React.FC = () => {
         role
       });
 
-      console.log("Register response:", response.data);
       setSuccess("Registration successful!");
     } catch (err: any) {
-      console.error("Register error:", err);
-
-      if (err.response) {
-        setError(err.response.data || "Registration failed");
-      } else if (err.request) {
-        setError("No response from server");
-      } else {
-        setError("Error: " + err.message);
-      }
-    }
+  if (err.response) {
+    // If it's an object, grab just the message string. 
+    // If it's already a string, use it.
+    const rawData = err.response.data;
+    const finalMessage = typeof rawData === 'object' ? (rawData.message || "Error") : rawData;
+    
+    setError(finalMessage); 
+  } else {
+    setError("Server is offline");
+  }
+}
   };
 
   return (
