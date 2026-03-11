@@ -33,4 +33,6 @@ build/
 .vscode/
 
 # Firebase private keys
-src/main/resources/serviceAccountKey.json
+/src/main/resources/firebase-service-account.json
+
+/src/main/resources/application.properties

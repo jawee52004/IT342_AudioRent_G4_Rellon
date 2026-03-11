@@ -4,23 +4,36 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import org.springframework.context.annotation.Configuration;
-
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Configuration
 public class FirebaseConfig {
 
     @PostConstruct
-    public void initialize() throws IOException {
+    public void initialize() {
+        try {
+            // This looks for the file inside src/main/resources
+            InputStream serviceAccount =
+                    getClass().getClassLoader().getResourceAsStream("firebase-service-account.json");
 
-        if (FirebaseApp.getApps().isEmpty()) {
+            if (serviceAccount == null) {
+                System.err.println("Could not find serviceAccountKey.json in resources!");
+                return;
+            }
 
             FirebaseOptions options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.getApplicationDefault())
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    // When you're ready for image uploads, add .setStorageBucket here
                     .build();
 
-            FirebaseApp.initializeApp(options);
+            if (FirebaseApp.getApps().isEmpty()) {
+                FirebaseApp.initializeApp(options);
+                System.out.println("Firebase initialized successfully!");
+            }
+        } catch (IOException e) {
+            System.err.println("Error initializing Firebase: " + e.getMessage());
         }
     }
 }

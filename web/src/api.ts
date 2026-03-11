@@ -1,31 +1,47 @@
-// src/api.ts
 import axios from "axios";
 
-// Replace with your backend URL
-const API_URL = "http://localhost:8080/api"; 
+// Base URL for all requests
+const API_BASE_URL = "http://localhost:8080"; 
+
+// 1. Create a "Smart" instance of axios
+const api = axios.create({
+  baseURL: API_BASE_URL,
+});
+
+// 2. Add the "Interceptor" to attach the token automatically
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export interface User {
   username: string;
   password: string;
-  email?: string; // optional for login
+  email?: string;
+  fullName?: string; // Matching your backend field
+  role?: string;
 }
 
-// Register user
+// 3. Updated functions using the 'api' instance
 export const registerUser = async (user: User) => {
   try {
-    const response = await axios.post(`${API_URL}/auth/register`, user);
+    const response = await api.post(`/auth/register`, user);
     return response.data;
   } catch (error: any) {
     throw error.response?.data || { message: "Registration failed" };
   }
 };
 
-// Login user
-export const loginUser = async (user: User) => {
+export const loginUser = async (credentials: any) => {
   try {
-    const response = await axios.post(`${API_URL}/auth/login`, user);
-    return response.data; // expect token or user info
+    const response = await api.post(`/auth/login`, credentials);
+    return response.data; // This now carries the token
   } catch (error: any) {
     throw error.response?.data || { message: "Login failed" };
   }
 };
+
+export default api;
