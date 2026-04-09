@@ -22,7 +22,8 @@ public class AuthController {
     public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> request) {
         try {
             String googleToken = request.get("token");
-            return ResponseEntity.ok(authFacade.processGoogleLogin(googleToken));
+            String role = request.get("role");
+            return ResponseEntity.ok(authFacade.processGoogleLogin(googleToken, role));
         } catch (Exception e) {
             return ResponseEntity.status(401).body("Google Authentication Failed: " + e.getMessage());
         }

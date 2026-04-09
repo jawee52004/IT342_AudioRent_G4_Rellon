@@ -4,6 +4,7 @@ import com.AudioRent.backend.dto.RegisterRequest;
 import com.AudioRent.backend.model.User;
 import com.AudioRent.backend.security.JwtUtils;
 import com.AudioRent.backend.service.AuthService;
+import com.AudioRent.backend.model.Role;
 import org.springframework.stereotype.Component;
 import java.util.Map;
 
@@ -27,8 +28,9 @@ public class AuthFacade {
         return authService.register(request.getFullName(), request.getEmail(), request.getPassword(), request.getRole());
     }
 
-    public Map<String, Object> processGoogleLogin(String googleToken) throws Exception {
-        User user = authService.processGoogleLogin(googleToken);
+    public Map<String, Object> processGoogleLogin(String googleToken, String roleStr) throws Exception {
+        Role role = roleStr != null && !roleStr.isEmpty() ? Role.valueOf(roleStr) : null;
+        User user = authService.processGoogleLogin(googleToken, role);
         String token = jwtUtils.generateToken(user.getEmail());
         return Map.of("token", token, "fullName", user.getFullName(), "role", user.getRole());
     }

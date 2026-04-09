@@ -25,12 +25,12 @@ public class UserFactory {
                 .build();
     }
     
-    public User createGoogleUser(String name, String email) {
+    public User createGoogleUser(String name, String email, Role role) {
         return User.builder()
                 .fullName(name)
                 .email(email)
                 .passwordHash("") // No password for Google
-                .role(Role.CUSTOMER)
+                .role(role)
                 .isActive(true)
                 .createdAt(com.google.cloud.Timestamp.now())
                 .build();

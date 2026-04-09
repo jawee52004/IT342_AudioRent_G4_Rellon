@@ -41,7 +41,7 @@ public class AuthService {
         this.eventPublisher = eventPublisher;
     }
 
-    public User processGoogleLogin(String googleToken) throws Exception {
+    public User processGoogleLogin(String googleToken, Role role) throws Exception {
         // Adapter Pattern usage
         Map<String, String> payload = oAuthProvider.verifyTokenAndGetPayload(googleToken);
         String email = payload.get("email");
@@ -52,8 +52,11 @@ public class AuthService {
         if (userOpt.isPresent()) {
             return userOpt.get();
         } else {
+            if (role == null) {
+                throw new RuntimeException("Role selection is required for new Google accounts.");
+            }
             // Factory Pattern usage
-            User newUser = userFactory.createGoogleUser(name, email);
+            User newUser = userFactory.createGoogleUser(name, email, role);
             User savedUser = userRepository.save(newUser);
             
             // Observer Pattern usage

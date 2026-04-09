@@ -28,7 +28,14 @@ const Login: React.FC = () => {
       localStorage.setItem("userName", fullName);
 
       setSuccess("Login successful!");
-      navigate("/landing");
+      
+      if (role === "PROVIDER") {
+        navigate("/provider");
+      } else if (role === "ADMIN") {
+        navigate("/admin");
+      } else {
+        navigate("/landing");
+      }
     } catch (err: any) {
       setError(err.response?.data || "Login failed");
     }
@@ -49,10 +56,21 @@ const Login: React.FC = () => {
       localStorage.setItem("userRole", role);
 
       setSuccess("Logged in with Google!");
-      navigate("/landing");
+
+      if (role === "PROVIDER") {
+        navigate("/provider");
+      } else if (role === "ADMIN") {
+        navigate("/admin");
+      } else {
+        navigate("/landing");
+      }
     } catch (err: any) {
       console.error("Google Server Error:", err);
-      setError("Server failed to verify Google account.");
+      if (err.response && err.response.data && typeof err.response.data === "string" && err.response.data.includes("Role selection is required")) {
+        setError("Account not found. Please go to the Register page to create an account with Google.");
+      } else {
+        setError("Server failed to verify Google account.");
+      }
     }
   };
 
