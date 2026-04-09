@@ -1,17 +1,17 @@
 package com.AudioRent.backend.service;
 
+import com.AudioRent.backend.adapter.OAuthProvider;
+import com.AudioRent.backend.event.UserRegisteredEvent;
+import com.AudioRent.backend.factory.UserFactory;
 import com.AudioRent.backend.model.Role;
 import com.AudioRent.backend.model.User;
 import com.AudioRent.backend.repository.UserRepository;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.AudioRent.backend.strategy.UserValidationStrategy;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
@@ -20,47 +20,49 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final String GOOGLE_CLIENT_ID = "1075750667833-kisopk6s1pl2egd1a6l7cuh28aodtfrd.apps.googleusercontent.com";
+    
+    // Design Patterns Injectables
+    private final UserFactory userFactory;
+    private final OAuthProvider oAuthProvider;
+    private final UserValidationStrategy validationStrategy;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public AuthService(UserRepository userRepository) {
+    public AuthService(UserRepository userRepository, 
+                       PasswordEncoder passwordEncoder,
+                       UserFactory userFactory,
+                       OAuthProvider oAuthProvider,
+                       UserValidationStrategy validationStrategy,
+                       ApplicationEventPublisher eventPublisher) {
         this.userRepository = userRepository;
-        this.passwordEncoder = new BCryptPasswordEncoder();
+        this.passwordEncoder = passwordEncoder;
+        this.userFactory = userFactory;
+        this.oAuthProvider = oAuthProvider;
+        this.validationStrategy = validationStrategy;
+        this.eventPublisher = eventPublisher;
     }
 
-    public User processGoogleLogin(String idTokenString) throws Exception {
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-                .setAudience(Collections.singletonList(GOOGLE_CLIENT_ID))
-                .build();
+    public User processGoogleLogin(String googleToken) throws Exception {
+        // Adapter Pattern usage
+        Map<String, String> payload = oAuthProvider.verifyTokenAndGetPayload(googleToken);
+        String email = payload.get("email");
+        String name = payload.get("name");
 
-        GoogleIdToken idToken = verifier.verify(idTokenString);
-        if (idToken == null) {
-            throw new RuntimeException("Invalid Google Token");
-        }
-
-        GoogleIdToken.Payload payload = idToken.getPayload();
-        String email = payload.getEmail();
-        String name = (String) payload.get("name");
-
-        // Check if user exists in Firestore
         Optional<User> userOpt = userRepository.findByEmail(email);
 
         if (userOpt.isPresent()) {
             return userOpt.get();
         } else {
-            // Create new Google User in Firestore
-            User newUser = User.builder()
-                    .fullName(name)
-                    .email(email)
-                    .passwordHash("") // No password for Google users
-                    .role(Role.CUSTOMER)
-                    .isActive(true)
-                    .createdAt(com.google.cloud.Timestamp.now())
-                    .build();
-            return userRepository.save(newUser);
+            // Factory Pattern usage
+            User newUser = userFactory.createGoogleUser(name, email);
+            User savedUser = userRepository.save(newUser);
+            
+            // Observer Pattern usage
+            eventPublisher.publishEvent(new UserRegisteredEvent(savedUser));
+            
+            return savedUser;
         }
     }
 
-    // ... Keep your existing register() and login() methods below ...
     public User login(String email, String password) throws ExecutionException, InterruptedException {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty() || !passwordEncoder.matches(password, userOpt.get().getPasswordHash())) {
@@ -69,18 +71,27 @@ public class AuthService {
         return userOpt.get();
     }
 
-    public User register(String fullName, String email, String password, Role role) throws ExecutionException, InterruptedException {
+    public User register(String fullName, String email, String password, Role role) throws Exception {
         if (userRepository.findByEmail(email).isPresent()) {
             throw new RuntimeException("Email is already registered");
         }
-        User user = User.builder()
-                .fullName(fullName)
-                .email(email)
-                .passwordHash(passwordEncoder.encode(password))
-                .role(role != null ? role : Role.CUSTOMER)
-                .isActive(true)
-                .createdAt(com.google.cloud.Timestamp.now())
-                .build();
-        return userRepository.save(user);
+
+        // Factory Pattern usage
+        User user = userFactory.createCustomer(fullName, email, password);
+        
+        // Strategy Pattern usage
+        validationStrategy.validate(user);
+        
+        // Ensure role is correctly overridden if provided
+        if(role != null) {
+            user.setRole(role);
+        }
+
+        User savedUser = userRepository.save(user);
+        
+        // Observer Pattern usage
+        eventPublisher.publishEvent(new UserRegisteredEvent(savedUser));
+        
+        return savedUser;
     }
 }

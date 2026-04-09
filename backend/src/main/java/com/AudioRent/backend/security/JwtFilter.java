@@ -29,10 +29,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            String email = jwtUtils.extractEmail(token); // We'll add this method next
+            String email = jwtUtils.extractEmail(token);
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                // If token is valid, tell Spring this user is authenticated
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(email, null, new ArrayList<>());
                 SecurityContextHolder.getContext().setAuthentication(authToken);

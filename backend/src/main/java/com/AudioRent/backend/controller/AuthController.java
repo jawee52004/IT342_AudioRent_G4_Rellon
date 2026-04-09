@@ -1,8 +1,8 @@
 package com.AudioRent.backend.controller;
 
+import com.AudioRent.backend.dto.RegisterRequest;
+import com.AudioRent.backend.facade.AuthFacade;
 import com.AudioRent.backend.model.User;
-import com.AudioRent.backend.service.AuthService;
-import com.AudioRent.backend.security.JwtUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,28 +12,17 @@ import java.util.Map;
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final AuthService authService;
-    private final JwtUtils jwtUtils;
+    private final AuthFacade authFacade;
 
-    public AuthController(AuthService authService, JwtUtils jwtUtils) {
-        this.authService = authService;
-        this.jwtUtils = jwtUtils;
+    public AuthController(AuthFacade authFacade) {
+        this.authFacade = authFacade;
     }
 
     @PostMapping("/google")
     public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> request) {
         try {
             String googleToken = request.get("token");
-            User user = authService.processGoogleLogin(googleToken);
-
-            // Generate your custom backend JWT
-            String token = jwtUtils.generateToken(user.getEmail());
-
-            return ResponseEntity.ok(Map.of(
-                    "token", token,
-                    "fullName", user.getFullName(),
-                    "role", user.getRole()
-            ));
+            return ResponseEntity.ok(authFacade.processGoogleLogin(googleToken));
         } catch (Exception e) {
             return ResponseEntity.status(401).body("Google Authentication Failed: " + e.getMessage());
         }
@@ -42,22 +31,16 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
         try {
-            User user = authService.login(request.get("email"), request.get("password"));
-            String token = jwtUtils.generateToken(user.getEmail());
-            return ResponseEntity.ok(Map.of(
-                    "token", token,
-                    "fullName", user.getFullName(),
-                    "role", user.getRole()
-            ));
+            return ResponseEntity.ok(authFacade.loginUser(request.get("email"), request.get("password")));
         } catch (Exception e) {
             return ResponseEntity.status(401).body(e.getMessage());
         }
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody com.AudioRent.backend.dto.RegisterRequest request) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {
-            User user = authService.register(request.getFullName(), request.getEmail(), request.getPassword(), request.getRole());
+            User user = authFacade.registerUser(request);
             return ResponseEntity.ok(user);
         } catch (Exception e) {
             return ResponseEntity.status(400).body(e.getMessage());
