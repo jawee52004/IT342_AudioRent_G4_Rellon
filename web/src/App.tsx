@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Landing from "./pages/Landing"; 
+import ProviderDashboard from "./pages/ProviderDashboard";
+import AdminDashboard from "./pages/AdminDashboard"; 
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 function App() {
@@ -15,6 +17,8 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/landing" element={<Landing />} />
+            <Route path="/provider" element={<ProviderDashboard />} />
+            <Route path="/admin" element={<AdminDashboard />} />
             <Route path="*" element={<Login />} />
           </Routes>
         </div>

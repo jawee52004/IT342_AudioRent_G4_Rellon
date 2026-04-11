@@ -1,7 +1,8 @@
 // src/pages/.tsx
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom"; // <-- for navigation
+import { Link, useNavigate } from "react-router-dom"; // <-- for navigation
+import { GoogleLogin } from "@react-oauth/google";
 
 const Register: React.FC = () => {
   const [fullName, setFullName] = useState("");
@@ -10,6 +11,44 @@ const Register: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [role, setRole] = useState("");
+  const navigate = useNavigate();
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    if (!role) {
+      setError("Please select a role before registering with Google.");
+      return;
+    }
+    setError(null);
+    try {
+      const response = await axios.post("http://localhost:8080/auth/google", {
+        token: credentialResponse.credential,
+        role: role
+      });
+
+      const { token, fullName, role: r } = response.data;
+      localStorage.setItem("token", token);
+      localStorage.setItem("userName", fullName);
+      localStorage.setItem("userRole", r);
+
+      setSuccess("Registered with Google!");
+
+      if (r === "PROVIDER") {
+        navigate("/provider");
+      } else if (r === "ADMIN") {
+        navigate("/admin");
+      } else {
+        navigate("/landing");
+      }
+    } catch (err: any) {
+      if (err.response) {
+        const rawData = err.response.data;
+        const finalMessage = typeof rawData === 'object' ? (rawData.message || "Error") : rawData;
+        setError(finalMessage);
+      } else {
+        setError("Server failed to verify Google account.");
+      }
+    }
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,6 +131,18 @@ const Register: React.FC = () => {
 
         <button type="submit">Register</button>
       </form>
+
+      <div style={{ textAlign: "center", margin: "15px 0", fontSize: "12px" }}>OR</div>
+
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: "15px" }}>
+        <GoogleLogin
+          onSuccess={handleGoogleSuccess}
+          onError={() => setError("Google Registration Failed")}
+          theme="outline"
+          shape="square"
+          width="400px"
+        />
+      </div>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
       {success && <p style={{ color: "green" }}>{success}</p>}
