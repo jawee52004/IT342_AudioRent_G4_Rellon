@@ -25,7 +25,7 @@ public class FirebaseConfig {
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    // When you're ready for image uploads, add .setStorageBucket here
+                    .setStorageBucket("audiorent-26b13.firebasestorage.app")
                     .build();
 
             if (FirebaseApp.getApps().isEmpty()) {
