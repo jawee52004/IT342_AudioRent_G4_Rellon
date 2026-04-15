@@ -56,7 +56,7 @@ const Register: React.FC = () => {
     setSuccess(null);
 
     try {
-      const response = await axios.post("http://localhost:8080/auth/register", {
+      await axios.post("http://localhost:8080/auth/register", {
         fullName,
         email,
         password,

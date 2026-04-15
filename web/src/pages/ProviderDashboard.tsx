@@ -30,10 +30,12 @@ const ProviderDashboard: React.FC = () => {
       <p>Welcome, Provider <strong>{userName || "Valued Partner"}</strong></p>
       
       <div style={{ marginTop: "30px", border: "1px solid #ccc", padding: "20px", display: "inline-block" }}>
-        <h3>Your Listings</h3>
-        <p>No listings available yet.</p>
-        <button style={{ padding: "10px", backgroundColor: "#000", color: "#fff", border: "none", cursor: "pointer" }}>
-          Add Listing
+        <h3>Your Provider Tools</h3>
+        <p>Manage your audio equipment listings here.</p>
+        <button 
+          onClick={() => navigate("/my-packages")}
+          style={{ padding: "10px", backgroundColor: "#000", color: "#fff", border: "none", cursor: "pointer", marginTop: "10px", fontWeight: "bold" }}>
+          Manage Packages
         </button>
       </div>
 
