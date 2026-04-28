@@ -69,6 +69,7 @@ public class RentalService {
                 .customerName(customerName)
                 .packageId(pkg.getId())
                 .packageName(pkg.getName())
+                .packageImageUrl(pkg.getImageUrls() != null && !pkg.getImageUrls().isEmpty() ? pkg.getImageUrls().get(0) : null)
                 .providerId(pkg.getProviderId())
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
@@ -86,6 +87,28 @@ public class RentalService {
     public List<Rental> getRentalsByCustomer(String customerId)
             throws ExecutionException, InterruptedException {
         return rentalRepository.findByCustomerId(customerId);
+    }
+
+    public List<Rental> getRentalsByProvider(String providerId)
+            throws ExecutionException, InterruptedException {
+        return rentalRepository.findByProviderId(providerId);
+    }
+
+    public Rental updateRentalStatus(String rentalId, RentalStatus status)
+            throws ExecutionException, InterruptedException {
+        Optional<Rental> rentalOpt = rentalRepository.findById(rentalId);
+        if (rentalOpt.isEmpty()) {
+            throw new RuntimeException("Rental not found");
+        }
+        Rental rental = rentalOpt.get();
+        rental.setStatus(status);
+        rental.setUpdatedAt(Timestamp.now());
+        return rentalRepository.save(rental);
+    }
+
+    public List<Rental> getRentalsByPackage(String packageId)
+            throws ExecutionException, InterruptedException {
+        return rentalRepository.findByPackageId(packageId);
     }
 
     public List<Rental> getAllRentals() throws ExecutionException, InterruptedException {

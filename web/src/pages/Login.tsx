@@ -22,10 +22,11 @@ const Login: React.FC = () => {
         password
       });
 
-      const { token, fullName, role } = response.data;
+      const { token, fullName, role, id } = response.data;
       localStorage.setItem("token", token);
       localStorage.setItem("userRole", role);
       localStorage.setItem("userName", fullName);
+      localStorage.setItem("userId", id);
 
       setSuccess("Login successful!");
       
@@ -50,10 +51,11 @@ const Login: React.FC = () => {
         token: credentialResponse.credential 
       });
 
-      const { token, fullName, role } = response.data;
+      const { token, fullName, role, id } = response.data;
       localStorage.setItem("token", token);
-      localStorage.setItem("userName", fullName);
       localStorage.setItem("userRole", role);
+      localStorage.setItem("userName", fullName);
+      localStorage.setItem("userId", id);
 
       setSuccess("Logged in with Google!");
 

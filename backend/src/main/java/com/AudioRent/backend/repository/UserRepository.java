@@ -6,6 +6,8 @@ import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -63,5 +65,16 @@ public class UserRepository {
         }
 
         return Optional.ofNullable(document.toObject(User.class));
+    }
+
+    public List<User> findAll() throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+        QuerySnapshot snapshot = db.collection(COLLECTION_NAME).get().get();
+        List<User> users = new ArrayList<>();
+        snapshot.getDocuments().forEach(doc -> {
+            User user = doc.toObject(User.class);
+            if (user != null) users.add(user);
+        });
+        return users;
     }
 }

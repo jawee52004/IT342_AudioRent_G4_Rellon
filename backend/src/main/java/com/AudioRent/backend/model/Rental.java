@@ -14,6 +14,7 @@ public class Rental {
     private String customerName;
     private String packageId;
     private String packageName;
+    private String packageImageUrl;
     private String providerId;
     private String startDate;   // stored as ISO string "yyyy-MM-dd"
     private String endDate;

@@ -63,4 +63,16 @@ public class PackageRepository {
         Firestore db = FirestoreClient.getFirestore();
         db.collection(COLLECTION).document(id).delete().get();
     }
+
+    /** Admin-only: returns ALL packages including inactive/deactivated ones */
+    public List<Package> findAllIncludingInactive() throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+        QuerySnapshot snapshot = db.collection(COLLECTION).get().get();
+        List<Package> packages = new ArrayList<>();
+        snapshot.getDocuments().forEach(doc -> {
+            Package pkg = doc.toObject(Package.class);
+            if (pkg != null) packages.add(pkg);
+        });
+        return packages;
+    }
 }

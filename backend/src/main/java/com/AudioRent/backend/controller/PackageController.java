@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.google.cloud.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,11 +19,15 @@ public class PackageController {
     private final PackageService packageService;
     private final JwtUtils jwtUtils;
     private final UserRepository userRepository;
+    private final com.AudioRent.backend.repository.PackageRepository packageRepository;
 
-    public PackageController(PackageService packageService, JwtUtils jwtUtils, UserRepository userRepository) {
+    public PackageController(PackageService packageService, JwtUtils jwtUtils, 
+                             UserRepository userRepository,
+                             com.AudioRent.backend.repository.PackageRepository packageRepository) {
         this.packageService = packageService;
         this.jwtUtils = jwtUtils;
         this.userRepository = userRepository;
+        this.packageRepository = packageRepository;
     }
 
     // GET /packages - Public: list all active packages
@@ -127,6 +132,34 @@ public class PackageController {
             return ResponseEntity.ok("Package deleted successfully");
         } catch (Exception e) {
             return ResponseEntity.status(400).body("Error deleting package: " + e.getMessage());
+        }
+    }
+
+    // PUT /packages/{id}/toggle-status - Toggle package active/inactive
+    @PutMapping("/{id}/toggle-status")
+    public ResponseEntity<?> toggleStatus(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable String id) {
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            String email = jwtUtils.extractEmail(token);
+            var userOpt = userRepository.findByEmail(email);
+            if (userOpt.isEmpty()) return ResponseEntity.status(401).body("Unauthorized");
+            
+            Optional<Package> pkgOpt = packageService.getPackageById(id);
+            if (pkgOpt.isEmpty()) return ResponseEntity.status(404).body("Package not found");
+            Package pkg = pkgOpt.get();
+            
+            if (!pkg.getProviderId().equals(userOpt.get().getId())) {
+                return ResponseEntity.status(403).body("Unauthorized");
+            }
+            
+            pkg.setIsActive(!pkg.getIsActive());
+            pkg.setUpdatedAt(Timestamp.now());
+            Package updated = packageRepository.save(pkg);
+            return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Error: " + e.getMessage());
         }
     }
 }

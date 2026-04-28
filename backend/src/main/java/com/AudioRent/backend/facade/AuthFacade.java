@@ -21,7 +21,12 @@ public class AuthFacade {
     public Map<String, Object> loginUser(String email, String password) throws Exception {
         User user = authService.login(email, password);
         String token = jwtUtils.generateToken(user.getEmail());
-        return Map.of("token", token, "fullName", user.getFullName(), "role", user.getRole());
+        return Map.of(
+            "token", token, 
+            "fullName", user.getFullName(), 
+            "role", user.getRole(),
+            "id", user.getId()
+        );
     }
 
     public User registerUser(RegisterRequest request) throws Exception {
@@ -32,6 +37,11 @@ public class AuthFacade {
         Role role = roleStr != null && !roleStr.isEmpty() ? Role.valueOf(roleStr) : null;
         User user = authService.processGoogleLogin(googleToken, role);
         String token = jwtUtils.generateToken(user.getEmail());
-        return Map.of("token", token, "fullName", user.getFullName(), "role", user.getRole());
+        return Map.of(
+            "token", token, 
+            "fullName", user.getFullName(), 
+            "role", user.getRole(),
+            "id", user.getId()
+        );
     }
 }
