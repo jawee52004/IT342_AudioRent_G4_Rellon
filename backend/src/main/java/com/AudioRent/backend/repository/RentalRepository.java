@@ -46,6 +46,32 @@ public class RentalRepository {
         return rentals;
     }
 
+    public List<Rental> findByProviderId(String providerId) throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+        QuerySnapshot snapshot = db.collection(COLLECTION)
+                .whereEqualTo("providerId", providerId)
+                .get().get();
+        List<Rental> rentals = new ArrayList<>();
+        snapshot.getDocuments().forEach(doc -> {
+            Rental rental = doc.toObject(Rental.class);
+            if (rental != null) rentals.add(rental);
+        });
+        return rentals;
+    }
+
+    public List<Rental> findByPackageId(String packageId) throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+        QuerySnapshot snapshot = db.collection(COLLECTION)
+                .whereEqualTo("packageId", packageId)
+                .get().get();
+        List<Rental> rentals = new ArrayList<>();
+        snapshot.getDocuments().forEach(doc -> {
+            Rental rental = doc.toObject(Rental.class);
+            if (rental != null) rentals.add(rental);
+        });
+        return rentals;
+    }
+
     public List<Rental> findAll() throws ExecutionException, InterruptedException {
         Firestore db = FirestoreClient.getFirestore();
         QuerySnapshot snapshot = db.collection(COLLECTION).get().get();

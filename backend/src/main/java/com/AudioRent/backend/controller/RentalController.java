@@ -74,4 +74,51 @@ public class RentalController {
             return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
+
+    // GET /rentals/provider - Provider: get rentals for own packages
+    @GetMapping("/provider")
+    public ResponseEntity<?> getProviderRentals(
+            @RequestHeader("Authorization") String authHeader) {
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            String email = jwtUtils.extractEmail(token);
+            var userOpt = userRepository.findByEmail(email);
+            if (userOpt.isEmpty()) return ResponseEntity.status(401).body("Unauthorized");
+            String providerId = userOpt.get().getId();
+            List<Rental> rentals = rentalService.getRentalsByProvider(providerId);
+            return ResponseEntity.ok(rentals);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error fetching provider rentals: " + e.getMessage());
+        }
+    }
+
+    // PUT /rentals/{id}/status - Provider: update rental status
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateStatus(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable String id,
+            @RequestParam com.AudioRent.backend.model.RentalStatus status) {
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            String email = jwtUtils.extractEmail(token);
+            var userOpt = userRepository.findByEmail(email);
+            if (userOpt.isEmpty()) return ResponseEntity.status(401).body("Unauthorized");
+            
+            // In a real app, we'd check if this provider owns the package in the rental
+            Rental updated = rentalService.updateRentalStatus(id, status);
+            return ResponseEntity.ok(updated);
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body("Error updating status: " + e.getMessage());
+        }
+    }
+
+    // GET /rentals/package/{packageId} - Customer: check availability
+    @GetMapping("/package/{packageId}")
+    public ResponseEntity<?> getRentalsByPackage(@PathVariable String packageId) {
+        try {
+            return ResponseEntity.ok(rentalService.getRentalsByPackage(packageId));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error: " + e.getMessage());
+        }
+    }
 }

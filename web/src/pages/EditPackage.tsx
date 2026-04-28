@@ -71,92 +71,202 @@ const EditPackage: React.FC = () => {
       await api.put(`/packages/${id}`, form, {
         headers: { "Content-Type": "multipart/form-data" }
       });
-      alert("Package updated successfully!");
+      alert("Listing updated successfully!");
       navigate("/my-packages");
     } catch (err: any) {
-      setError(err.response?.data || "Failed to update package.");
+      setError(err.response?.data || "Failed to update listing.");
     } finally {
       setLoading(false);
     }
   };
 
-  if (fetching) return <div style={{ textAlign: "center", marginTop: "50px" }}>Loading...</div>;
+  if (fetching) return (
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+      <p>Loading equipment details...</p>
+    </div>
+  );
 
   return (
-    <div style={{ maxWidth: "600px", margin: "40px auto", padding: "20px", fontFamily: "Arial, sans-serif", border: "1px solid #ddd", borderRadius: "8px" }}>
-      <button onClick={() => navigate(-1)} style={backButtonStyle}>Back</button>
-      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Edit Package</h2>
+    <div style={containerStyle}>
+      <div style={cardStyle}>
+        <button onClick={() => navigate(-1)} style={backBtnStyle}>← Back</button>
+        <h2 style={titleStyle}>Edit Listing</h2>
+        <p style={subtitleStyle}>Update your equipment details and pricing.</p>
 
-      {error && <div style={{ color: "red", marginBottom: "15px", textAlign: "center" }}>{error}</div>}
+        {error && <div style={errorStyle}>{error}</div>}
 
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-        <div>
-          <label style={labelStyle}>Package Name</label>
-          <input type="text" name="name" value={formData.name} onChange={handleInputChange} required style={inputStyle} />
-        </div>
-        <div>
-          <label style={labelStyle}>Description</label>
-          <textarea name="description" value={formData.description} onChange={handleInputChange} required style={{ ...inputStyle, minHeight: "80px" }} />
-        </div>
-        <div>
-          <label style={labelStyle}>Price per Day ($)</label>
-          <input type="number" name="price" value={formData.price} onChange={handleInputChange} min="0" step="0.01" required style={inputStyle} />
-        </div>
-        <div>
-          <label style={labelStyle}>Quantity Available</label>
-          <input type="number" name="quantity" value={formData.quantity} onChange={handleInputChange} min="1" required style={inputStyle} />
-        </div>
-        <div>
-          <label style={labelStyle}>Category</label>
-          <input type="text" name="category" value={formData.category} onChange={handleInputChange} required style={inputStyle} />
-        </div>
-        <div>
-          <label style={labelStyle}>New Images (Optional)</label>
-          <input type="file" multiple accept="image/png, image/jpeg" onChange={handleFileChange} style={inputStyle} />
-        </div>
-        
-        <button type="submit" disabled={loading} style={submitButtonStyle}>
-          {loading ? "Saving..." : "Update Package"}
-        </button>
-      </form>
+        <form onSubmit={handleSubmit} style={formStyle}>
+          <div style={inputGroup}>
+            <label style={labelStyle}>Equipment Title</label>
+            <input 
+              type="text" 
+              name="name" 
+              value={formData.name} 
+              onChange={handleInputChange} 
+              required 
+              style={inputStyle} 
+            />
+          </div>
+          
+          <div style={inputGroup}>
+            <label style={labelStyle}>Category</label>
+            <select 
+              name="category" 
+              value={formData.category} 
+              onChange={handleInputChange as any} 
+              required 
+              style={inputStyle}
+            >
+              <option value="">Select Category</option>
+              <option value="Basic (Small Events)">Basic (Small Events)</option>
+              <option value="Standard (Medium Events)">Standard (Medium Events)</option>
+              <option value="Professional (Large Events)">Professional (Large Events)</option>
+            </select>
+          </div>
+
+          <div style={inputGroup}>
+            <label style={labelStyle}>Description</label>
+            <textarea 
+              name="description" 
+              value={formData.description} 
+              onChange={handleInputChange} 
+              required 
+              style={{ ...inputStyle, minHeight: "120px" }} 
+            />
+          </div>
+
+          <div style={rowStyle}>
+            <div style={{ ...inputGroup, flex: 1 }}>
+              <label style={labelStyle}>Daily Rate ($)</label>
+              <input 
+                type="number" 
+                name="price" 
+                value={formData.price} 
+                onChange={handleInputChange} 
+                min="0" 
+                step="0.01" 
+                required 
+                style={inputStyle} 
+              />
+            </div>
+            <div style={{ ...inputGroup, flex: 1 }}>
+              <label style={labelStyle}>Inventory Quantity</label>
+              <input 
+                type="number" 
+                name="quantity" 
+                value={formData.quantity} 
+                onChange={handleInputChange} 
+                min="1" 
+                required 
+                style={inputStyle} 
+              />
+            </div>
+          </div>
+
+          <div style={inputGroup}>
+            <label style={labelStyle}>Replace Photos (Optional)</label>
+            <div style={fileUploadWrapper}>
+              <input 
+                type="file" 
+                multiple 
+                accept="image/png, image/jpeg" 
+                onChange={handleFileChange} 
+                style={fileInputStyle} 
+              />
+              <p style={fileHint}>Leave empty to keep existing images.</p>
+            </div>
+          </div>
+          
+          <button type="submit" disabled={loading} style={submitBtnStyle}>
+            {loading ? "Updating..." : "Save Changes"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
 
-const backButtonStyle = {
-  marginBottom: "20px",
-  padding: "8px 16px",
-  backgroundColor: "#ccc",
+// --- Styles ---
+
+const containerStyle: React.CSSProperties = {
+  backgroundColor: "#f9fafb",
+  minHeight: "100vh",
+  padding: "60px 20px",
+  fontFamily: "'Outfit', sans-serif"
+};
+
+const cardStyle: React.CSSProperties = {
+  maxWidth: "640px",
+  margin: "0 auto",
+  backgroundColor: "#fff",
+  padding: "40px",
+  borderRadius: "24px",
+  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+};
+
+const backBtnStyle: React.CSSProperties = {
+  background: "none",
   border: "none",
+  color: "#6b7280",
   cursor: "pointer",
-  fontWeight: "bold" as const,
-  borderRadius: "4px"
+  fontWeight: "600",
+  fontSize: "0.875rem",
+  marginBottom: "20px"
 };
 
-const labelStyle = {
-  display: "block",
-  marginBottom: "5px",
-  fontWeight: "bold" as const
+const titleStyle: React.CSSProperties = { fontSize: "2rem", fontWeight: "800", color: "#111827", margin: "0 0 8px 0" };
+const subtitleStyle: React.CSSProperties = { color: "#6b7280", margin: "0 0 32px 0", fontSize: "0.95rem" };
+
+const errorStyle: React.CSSProperties = {
+  backgroundColor: "#fef2f2",
+  color: "#b91c1c",
+  padding: "12px",
+  borderRadius: "12px",
+  marginBottom: "20px",
+  textAlign: "center",
+  fontSize: "0.875rem",
+  fontWeight: "600"
 };
 
-const inputStyle = {
-  width: "100%",
-  padding: "10px",
-  border: "1px solid #ccc",
-  borderRadius: "4px",
-  boxSizing: "border-box" as const
+const formStyle: React.CSSProperties = { display: "flex", flexDirection: "column", gap: "24px" };
+const inputGroup: React.CSSProperties = { display: "flex", flexDirection: "column", gap: "8px" };
+const labelStyle: React.CSSProperties = { fontSize: "0.875rem", fontWeight: "600", color: "#374151" };
+
+const inputStyle: React.CSSProperties = {
+  padding: "14px",
+  borderRadius: "12px",
+  border: "1px solid #e5e7eb",
+  fontSize: "1rem",
+  color: "#111827",
+  backgroundColor: "#fcfcfc",
+  transition: "border-color 0.2s",
+  outline: "none"
 };
 
-const submitButtonStyle = {
-  padding: "15px",
-  backgroundColor: "#000",
+const rowStyle: React.CSSProperties = { display: "flex", gap: "20px" };
+
+const fileUploadWrapper: React.CSSProperties = {
+  border: "2px dashed #e5e7eb",
+  padding: "20px",
+  borderRadius: "12px",
+  textAlign: "center",
+  backgroundColor: "#f9fafb"
+};
+
+const fileInputStyle: React.CSSProperties = { width: "100%", cursor: "pointer" };
+const fileHint: React.CSSProperties = { fontSize: "0.75rem", color: "#9ca3af", marginTop: "8px", margin: "8px 0" };
+
+const submitBtnStyle: React.CSSProperties = {
+  marginTop: "16px",
+  padding: "16px",
+  backgroundColor: "#111827",
   color: "#fff",
   border: "none",
+  borderRadius: "14px",
+  fontSize: "1rem",
+  fontWeight: "700",
   cursor: "pointer",
-  fontWeight: "bold" as const,
-  fontSize: "16px",
-  borderRadius: "4px",
-  marginTop: "10px"
+  transition: "transform 0.1s"
 };
 
 export default EditPackage;
