@@ -55,193 +55,144 @@ const MyPackages: React.FC = () => {
     }
   };
 
+  const activeCount = packages.filter(pkg => pkg.isActive).length;
+  const totalStock = packages.reduce((sum, pkg) => sum + pkg.quantity, 0);
+
   return (
     <div style={containerStyle}>
-      <div style={headerNav}>
-        <button onClick={() => navigate("/provider")} style={backBtnStyle}>← Back to Dashboard</button>
-      </div>
-      
-      <div style={headerAction}>
-        <h2 style={listTitle}>My Equipment Inventory</h2>
-        <Link to="/packages/create" style={createBtnStyle}>+ Add New Equipment</Link>
-      </div>
+      <header style={pageHeaderStyle}>
+        <div>
+          <button onClick={() => navigate("/provider")} style={backBtnStyle}>Back to Dashboard</button>
+          <p style={eyebrowStyle}>Inventory manager</p>
+          <h1 style={titleStyle}>My Equipment Inventory</h1>
+          <p style={subtitleStyle}>Maintain your listings, stock counts, visibility, and rental-ready package details.</p>
+        </div>
+        <Link to="/packages/create" style={createBtnStyle}>Add New Equipment</Link>
+      </header>
+
+      <section style={summaryGridStyle}>
+        <div style={summaryCardStyle}>
+          <span style={summaryLabelStyle}>Total Listings</span>
+          <strong style={summaryValueStyle}>{packages.length}</strong>
+        </div>
+        <div style={summaryCardStyle}>
+          <span style={summaryLabelStyle}>Active Listings</span>
+          <strong style={summaryValueStyle}>{activeCount}</strong>
+        </div>
+        <div style={summaryCardStyle}>
+          <span style={summaryLabelStyle}>Total Stock</span>
+          <strong style={summaryValueStyle}>{totalStock}</strong>
+        </div>
+      </section>
 
       {loading && <div style={msgBox}>Loading inventory...</div>}
       {error && <div style={{ ...msgBox, color: "#dc2626" }}>{error}</div>}
-      
+
       {!loading && packages.length === 0 && (
         <div style={emptyState}>
-           <p>No equipment listed yet. Click "+ Add New Equipment" to start.</p>
+          <h2 style={emptyTitleStyle}>No equipment listed yet</h2>
+          <p style={emptyTextStyle}>Add your first package so customers can start booking your audio gear.</p>
+          <Link to="/packages/create" style={emptyActionStyle}>Add Equipment</Link>
         </div>
       )}
 
-      <div style={packageGrid}>
+      <div style={packageGridStyle}>
         {packages.map((pkg) => (
-          <div key={pkg.id} style={pkgCardStyle}>
-            <div style={badgeRow}>
-               <span style={categoryBadge}>{pkg.category || "Audio"}</span>
-               <button 
-                  onClick={() => handleToggleStatus(pkg.id)}
-                  style={pkg.isActive ? activeBadgeBtn : inactiveBadgeBtn}
-               >
-                  {pkg.isActive ? "● Active" : "○ Disabled"}
-               </button>
+          <article key={pkg.id} style={pkgCardStyle}>
+            <div style={imageWrapStyle}>
+              {pkg.imageUrls && pkg.imageUrls.length > 0 ? (
+                <img src={pkg.imageUrls[0]} alt={pkg.name} style={thumbnailStyle} />
+              ) : (
+                <div style={thumbnailPlaceholderStyle}>No Image</div>
+              )}
+              <button
+                onClick={() => handleToggleStatus(pkg.id)}
+                style={pkg.isActive ? activeBadgeBtnStyle : inactiveBadgeBtnStyle}
+              >
+                {pkg.isActive ? "Active" : "Disabled"}
+              </button>
             </div>
-            {pkg.imageUrls && pkg.imageUrls.length > 0 ? (
-              <img src={pkg.imageUrls[0]} alt={pkg.name} style={thumbnailStyle} />
-            ) : (
-              <div style={thumbnailPlaceholder}>No Image</div>
-            )}
-            <h3 style={pkgTitle}>{pkg.name}</h3>
-            <div style={pkgDetails}>
-               <p><strong>Rate:</strong> ${pkg.price} / day</p>
-               <p><strong>Stock:</strong> {pkg.quantity} units</p>
+
+            <div style={cardBodyStyle}>
+              <span style={categoryBadgeStyle}>{pkg.category || "Audio"}</span>
+              <h2 style={pkgTitleStyle}>{pkg.name}</h2>
+              <div style={detailsGridStyle}>
+                <div>
+                  <span style={detailLabelStyle}>Rate</span>
+                  <strong style={detailValueStyle}>${pkg.price}/day</strong>
+                </div>
+                <div>
+                  <span style={detailLabelStyle}>Stock</span>
+                  <strong style={detailValueStyle}>{pkg.quantity} units</strong>
+                </div>
+              </div>
+              <div style={actionRowStyle}>
+                <Link to={`/packages/${pkg.id}/edit`} style={editBtnStyle}>Edit</Link>
+                <button onClick={() => handleDelete(pkg.id)} style={deleteBtnStyle}>Delete</button>
+              </div>
             </div>
-            <div style={actionRow}>
-              <Link to={`/packages/${pkg.id}/edit`} style={editBtn}>Edit</Link>
-              <button onClick={() => handleDelete(pkg.id)} style={deleteBtn}>Delete</button>
-            </div>
-          </div>
+          </article>
         ))}
       </div>
     </div>
   );
 };
 
-// --- Styles ---
-
 const containerStyle: React.CSSProperties = {
-  maxWidth: "1100px",
-  margin: "0 auto",
-  padding: "40px 20px",
-  fontFamily: "'Outfit', sans-serif"
+  backgroundColor: "#f5f7fb",
+  minHeight: "100vh",
+  padding: "40px clamp(20px, 5vw, 72px) 64px",
+  fontFamily: "Inter, Arial, sans-serif"
 };
 
-const headerNav: React.CSSProperties = { marginBottom: "20px" };
+const pageHeaderStyle: React.CSSProperties = {
+  alignItems: "flex-end",
+  display: "flex",
+  gap: "24px",
+  justifyContent: "space-between",
+  marginBottom: "22px"
+};
 
 const backBtnStyle: React.CSSProperties = {
   background: "none",
   border: "none",
-  cursor: "pointer",
   color: "#4b5563",
-  fontWeight: "600",
-  fontSize: "1rem"
+  cursor: "pointer",
+  fontSize: "0.9rem",
+  fontWeight: 800,
+  margin: "0 0 20px",
+  padding: 0
 };
 
-const headerAction: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  marginBottom: "40px"
-};
+const eyebrowStyle: React.CSSProperties = { color: "#0f766e", fontSize: "0.78rem", fontWeight: 900, letterSpacing: "0.08em", margin: "0 0 10px", textTransform: "uppercase" };
+const titleStyle: React.CSSProperties = { color: "#111827", fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 900, lineHeight: 1.05, margin: "0 0 10px" };
+const subtitleStyle: React.CSSProperties = { color: "#6b7280", lineHeight: 1.6, margin: 0, maxWidth: "640px" };
+const createBtnStyle: React.CSSProperties = { backgroundColor: "#111827", borderRadius: "8px", color: "#fff", fontWeight: 900, padding: "13px 18px", textDecoration: "none", whiteSpace: "nowrap" };
 
-const listTitle: React.CSSProperties = { fontSize: "2rem", fontWeight: "800", color: "#111827", margin: 0 };
-
-const createBtnStyle: React.CSSProperties = {
-  backgroundColor: "#111827",
-  color: "#fff",
-  padding: "12px 24px",
-  textDecoration: "none",
-  fontWeight: "bold",
-  borderRadius: "10px",
-  boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)"
-};
-
-const packageGrid: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-  gap: "24px"
-};
-
-const pkgCardStyle: React.CSSProperties = {
-  backgroundColor: "#fff",
-  borderRadius: "24px",
-  padding: "24px",
-  display: "flex",
-  flexDirection: "column",
-  border: "1px solid #f3f4f6",
-  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.05)"
-};
-
-const thumbnailStyle: React.CSSProperties = {
-  width: "100%",
-  height: "150px",
-  objectFit: "cover",
-  borderRadius: "16px",
-  marginBottom: "16px"
-};
-
-const thumbnailPlaceholder: React.CSSProperties = {
-  ...thumbnailStyle,
-  backgroundColor: "#f3f4f6",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  color: "#9ca3af",
-  fontSize: "0.875rem"
-};
-
-const badgeRow: React.CSSProperties = { display: "flex", justifyContent: "space-between", marginBottom: "16px" };
-
-const categoryBadge: React.CSSProperties = {
-  fontSize: "0.75rem",
-  fontWeight: "bold",
-  color: "#6b7280",
-  backgroundColor: "#f3f4f6",
-  padding: "4px 10px",
-  borderRadius: "20px"
-};
-
-const activeBadgeBtn: React.CSSProperties = {
-  fontSize: "0.75rem",
-  fontWeight: "bold",
-  color: "#059669",
-  backgroundColor: "#ecfdf5",
-  padding: "4px 10px",
-  borderRadius: "20px",
-  border: "1px solid #10b981",
-  cursor: "pointer"
-};
-
-const inactiveBadgeBtn: React.CSSProperties = {
-  ...activeBadgeBtn,
-  color: "#dc2626",
-  backgroundColor: "#fef2f2",
-  border: "1px solid #ef4444"
-};
-
-const pkgTitle: React.CSSProperties = { fontSize: "1.25rem", fontWeight: "700", color: "#111827", marginBottom: "16px" };
-
-const pkgDetails: React.CSSProperties = { color: "#4b5563", marginBottom: "24px" };
-
-const actionRow: React.CSSProperties = { display: "flex", gap: "12px" };
-
-const editBtn: React.CSSProperties = {
-  flex: 1,
-  textAlign: "center",
-  padding: "10px",
-  backgroundColor: "#fff",
-  border: "1px solid #e5e7eb",
-  borderRadius: "8px",
-  textDecoration: "none",
-  color: "#374151",
-  fontWeight: "600",
-  fontSize: "0.875rem"
-};
-
-const deleteBtn: React.CSSProperties = {
-  flex: 1,
-  padding: "10px",
-  backgroundColor: "#fee2e2",
-  border: "none",
-  borderRadius: "8px",
-  color: "#b91c1c",
-  fontWeight: "600",
-  fontSize: "0.875rem",
-  cursor: "pointer"
-};
-
-const msgBox: React.CSSProperties = { textAlign: "center", padding: "40px", fontSize: "1.1rem", color: "#6b7280" };
-const emptyState: React.CSSProperties = { ...msgBox, backgroundColor: "#f9fafb", borderRadius: "16px", border: "2px dashed #e5e7eb" };
+const summaryGridStyle: React.CSSProperties = { display: "grid", gap: "16px", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", marginBottom: "22px" };
+const summaryCardStyle: React.CSSProperties = { backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px", boxShadow: "0 10px 28px rgba(15, 23, 42, 0.06)", padding: "18px" };
+const summaryLabelStyle: React.CSSProperties = { color: "#6b7280", display: "block", fontSize: "0.75rem", fontWeight: 900, textTransform: "uppercase" };
+const summaryValueStyle: React.CSSProperties = { color: "#111827", display: "block", fontSize: "1.75rem", marginTop: "6px" };
+const packageGridStyle: React.CSSProperties = { display: "grid", gap: "20px", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" };
+const pkgCardStyle: React.CSSProperties = { backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px", boxShadow: "0 10px 28px rgba(15, 23, 42, 0.06)", overflow: "hidden" };
+const imageWrapStyle: React.CSSProperties = { backgroundColor: "#f3f4f6", height: "180px", position: "relative" };
+const thumbnailStyle: React.CSSProperties = { display: "block", height: "100%", objectFit: "cover", width: "100%" };
+const thumbnailPlaceholderStyle: React.CSSProperties = { alignItems: "center", color: "#9ca3af", display: "flex", height: "100%", justifyContent: "center" };
+const activeBadgeBtnStyle: React.CSSProperties = { backgroundColor: "#ecfdf5", border: "1px solid #10b981", borderRadius: "999px", color: "#047857", cursor: "pointer", fontSize: "0.75rem", fontWeight: 900, padding: "6px 10px", position: "absolute", right: "12px", top: "12px" };
+const inactiveBadgeBtnStyle: React.CSSProperties = { ...activeBadgeBtnStyle, backgroundColor: "#fef2f2", border: "1px solid #ef4444", color: "#b91c1c" };
+const cardBodyStyle: React.CSSProperties = { padding: "18px" };
+const categoryBadgeStyle: React.CSSProperties = { backgroundColor: "#f3f4f6", borderRadius: "999px", color: "#4b5563", display: "inline-block", fontSize: "0.72rem", fontWeight: 900, marginBottom: "12px", padding: "5px 9px" };
+const pkgTitleStyle: React.CSSProperties = { color: "#111827", fontSize: "1.15rem", fontWeight: 900, lineHeight: 1.3, margin: "0 0 16px", minHeight: "3em" };
+const detailsGridStyle: React.CSSProperties = { display: "grid", gap: "12px", gridTemplateColumns: "1fr 1fr", marginBottom: "18px" };
+const detailLabelStyle: React.CSSProperties = { color: "#9ca3af", display: "block", fontSize: "0.72rem", fontWeight: 900, marginBottom: "4px", textTransform: "uppercase" };
+const detailValueStyle: React.CSSProperties = { color: "#374151", fontSize: "0.95rem" };
+const actionRowStyle: React.CSSProperties = { display: "flex", gap: "10px" };
+const editBtnStyle: React.CSSProperties = { backgroundColor: "#111827", border: "1px solid #111827", borderRadius: "8px", color: "#fff", flex: 1, fontWeight: 900, padding: "10px", textAlign: "center", textDecoration: "none" };
+const deleteBtnStyle: React.CSSProperties = { backgroundColor: "#fff", border: "1px solid #fecaca", borderRadius: "8px", color: "#b91c1c", cursor: "pointer", flex: 1, fontWeight: 900, padding: "10px" };
+const msgBox: React.CSSProperties = { color: "#6b7280", padding: "40px", textAlign: "center" };
+const emptyState: React.CSSProperties = { backgroundColor: "#fff", border: "2px dashed #d1d5db", borderRadius: "8px", color: "#6b7280", marginTop: "20px", padding: "52px", textAlign: "center" };
+const emptyTitleStyle: React.CSSProperties = { color: "#111827", fontSize: "1.4rem", margin: "0 0 8px" };
+const emptyTextStyle: React.CSSProperties = { margin: "0 0 22px" };
+const emptyActionStyle: React.CSSProperties = { ...createBtnStyle, display: "inline-block" };
 
 export default MyPackages;

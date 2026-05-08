@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../common/api";
 import ApiService from "../../common/ApiService";
 
 interface User {
@@ -214,9 +213,9 @@ const AdminDashboard: React.FC = () => {
 
 const containerStyle: React.CSSProperties = {
   padding: "40px",
-  backgroundColor: "#f4f7f6",
+  backgroundColor: "#f5f7fb",
   minHeight: "100vh",
-  fontFamily: "'Inter', sans-serif"
+  fontFamily: "Inter, Arial, sans-serif"
 };
 
 const headerStyle: React.CSSProperties = {
@@ -230,12 +229,12 @@ const titleStyle: React.CSSProperties = {
   fontSize: "2rem",
   fontWeight: "800",
   margin: 0,
-  color: "#1a1a1a",
-  letterSpacing: "-0.05em"
+  color: "#111827",
+  letterSpacing: "0"
 };
 
 const subtitleStyle: React.CSSProperties = {
-  color: "#666",
+  color: "#6b7280",
   margin: "5px 0 0"
 };
 
@@ -261,16 +260,17 @@ const statsGrid: React.CSSProperties = {
 const statCard: React.CSSProperties = {
   padding: "20px",
   backgroundColor: "#fff",
-  borderRadius: "12px",
-  boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
-  textAlign: "center"
+  border: "1px solid #e5e7eb",
+  borderRadius: "8px",
+  boxShadow: "0 10px 28px rgba(15, 23, 42, 0.06)",
+  textAlign: "left"
 };
 
 const statNumber: React.CSSProperties = {
   fontSize: "24px",
   fontWeight: "bold",
   margin: "10px 0 0",
-  color: "#2563eb"
+  color: "#0f766e"
 };
 
 const tabsContainer: React.CSSProperties = {
@@ -298,8 +298,9 @@ const activeTabStyle: React.CSSProperties = {
 
 const mainContentStyle: React.CSSProperties = {
   backgroundColor: "#fff",
-  borderRadius: "16px",
-  boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
+  borderRadius: "8px",
+  border: "1px solid #e5e7eb",
+  boxShadow: "0 10px 28px rgba(15, 23, 42, 0.06)",
   overflow: "hidden"
 };
 

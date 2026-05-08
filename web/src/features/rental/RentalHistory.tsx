@@ -35,21 +35,13 @@ const RentalHistory: React.FC = () => {
     fetchRentals();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
-
   return (
     <div style={containerStyle}>
       <header style={headerStyle}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-          <div>
-            <button onClick={() => navigate(-1)} style={backBtnStyle}>← Back</button>
-            <h1 style={titleStyle}>My Rental History</h1>
-            <p style={subtitleStyle}>Track your past and upcoming audio equipment rentals.</p>
-          </div>
-          <button onClick={handleLogout} style={logoutButtonStyle}>Logout</button>
+        <div>
+          <button onClick={() => navigate(-1)} style={backBtnStyle}>Back</button>
+          <h1 style={titleStyle}>My Rental History</h1>
+          <p style={subtitleStyle}>Track your past and upcoming audio equipment rentals.</p>
         </div>
       </header>
       
@@ -123,10 +115,10 @@ const getStatusStyle = (status: string): React.CSSProperties => {
 // --- Styles ---
 
 const containerStyle: React.CSSProperties = {
-  backgroundColor: "#f9fafb",
+  backgroundColor: "#f5f7fb",
   minHeight: "100vh",
   padding: "60px 20px",
-  fontFamily: "'Outfit', sans-serif"
+  fontFamily: "Inter, Arial, sans-serif"
 };
 
 const headerStyle: React.CSSProperties = {
@@ -157,7 +149,7 @@ const gridStyle: React.CSSProperties = {
 
 const cardStyle: React.CSSProperties = {
   backgroundColor: "#fff",
-  borderRadius: "24px",
+  borderRadius: "8px",
   overflow: "hidden",
   border: "1px solid #f3f4f6",
   boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.05)",
@@ -214,7 +206,7 @@ const detailValue: React.CSSProperties = { fontSize: "1rem", fontWeight: "700", 
 const notesBox: React.CSSProperties = {
   padding: "16px",
   backgroundColor: "#f9fafb",
-  borderRadius: "12px",
+  borderRadius: "8px",
   marginTop: "20px"
 };
 
@@ -226,7 +218,7 @@ const notesText: React.CSSProperties = {
 };
 
 const msgBox: React.CSSProperties = { textAlign: "center", padding: "60px", color: "#6b7280" };
-const emptyState: React.CSSProperties = { textAlign: "center", padding: "80px", backgroundColor: "#fff", borderRadius: "24px", color: "#6b7280" };
+const emptyState: React.CSSProperties = { textAlign: "center", padding: "80px", backgroundColor: "#fff", borderRadius: "8px", color: "#6b7280" };
 
 const browseBtn: React.CSSProperties = {
   marginTop: "24px",
@@ -234,21 +226,9 @@ const browseBtn: React.CSSProperties = {
   backgroundColor: "#111827",
   color: "#fff",
   border: "none",
-  borderRadius: "12px",
+  borderRadius: "8px",
   fontWeight: "700",
   cursor: "pointer"
-};
-
-const logoutButtonStyle: React.CSSProperties = {
-  padding: "10px 20px",
-  backgroundColor: "#ef4444",
-  color: "#fff",
-  border: "none",
-  borderRadius: "12px",
-  cursor: "pointer",
-  fontWeight: "700",
-  fontSize: "0.875rem",
-  transition: "all 0.2s"
 };
 
 export default RentalHistory;

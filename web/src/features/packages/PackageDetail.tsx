@@ -34,58 +34,135 @@ const PackageDetail: React.FC = () => {
     fetchPackage();
   }, [id]);
 
-  if (loading) return <div style={{ textAlign: "center", marginTop: "50px" }}>Loading...</div>;
-  if (error) return <div style={{ color: "red", textAlign: "center", marginTop: "50px" }}>{error}</div>;
-  if (!pkg) return <div style={{ textAlign: "center", marginTop: "50px" }}>Package not found.</div>;
+  if (loading) return <div style={stateStyle}>Loading package details...</div>;
+  if (error) return <div style={{ ...stateStyle, color: "#b91c1c" }}>{error}</div>;
+  if (!pkg) return <div style={stateStyle}>Package not found.</div>;
 
   return (
-    <div style={{ maxWidth: "800px", margin: "40px auto", padding: "20px", fontFamily: "Arial, sans-serif" }}>
+    <div style={pageStyle}>
       <button onClick={() => navigate(-1)} style={backButtonStyle}>Back</button>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "30px" }}>
-        <div style={{ flex: "1 1 300px" }}>
+
+      <main style={detailShellStyle}>
+        <section style={mediaPanelStyle}>
           {pkg.imageUrls && pkg.imageUrls.length > 0 ? (
-            <img src={pkg.imageUrls[0]} alt={pkg.name} style={{ width: "100%", borderRadius: "8px", objectFit: "cover" }} />
+            <img src={pkg.imageUrls[0]} alt={pkg.name} style={imageStyle} />
           ) : (
-            <div style={{ width: "100%", height: "300px", backgroundColor: "#eee", display: "flex", alignItems: "center", justifyContent: "center", borderRadius: "8px" }}>No Image</div>
+            <div style={placeholderStyle}>No Image</div>
           )}
-        </div>
-        <div style={{ flex: "2 1 300px" }}>
-          <h2 style={{ margin: "0 0 10px 0", fontSize: "32px" }}>{pkg.name}</h2>
-          <p style={{ color: "#555", fontStyle: "italic", marginBottom: "20px" }}>Provider: {pkg.providerName}</p>
-          <p style={{ fontSize: "24px", fontWeight: "bold", margin: "0 0 20px 0" }}>${pkg.price} / day</p>
-          <p style={{ marginBottom: "10px" }}><strong>Category:</strong> {pkg.category}</p>
-          <p style={{ marginBottom: "20px" }}><strong>Available Qty:</strong> {pkg.quantity}</p>
-          <div style={{ marginBottom: "30px", lineHeight: "1.6" }}>
-            <strong>Description:</strong><br />
-            {pkg.description}
+        </section>
+
+        <section style={infoPanelStyle}>
+          <span style={badgeStyle}>{pkg.category}</span>
+          <h1 style={titleStyle}>{pkg.name}</h1>
+          <p style={providerStyle}>Provided by {pkg.providerName || "AudioRent partner"}</p>
+
+          <div style={metaGridStyle}>
+            <div style={metaItemStyle}>
+              <span style={metaLabelStyle}>Daily Rate</span>
+              <strong style={metaValueStyle}>${pkg.price}</strong>
+            </div>
+            <div style={metaItemStyle}>
+              <span style={metaLabelStyle}>Available Qty</span>
+              <strong style={metaValueStyle}>{pkg.quantity}</strong>
+            </div>
           </div>
-          
+
+          <div style={descriptionBlockStyle}>
+            <h2 style={sectionTitleStyle}>Description</h2>
+            <p style={descriptionStyle}>{pkg.description}</p>
+          </div>
+
           <Link to={`/packages/${pkg.id}/book`} style={bookButtonStyle}>Rent Now</Link>
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 };
 
-const backButtonStyle = {
-  marginBottom: "20px",
-  padding: "10px 20px",
-  backgroundColor: "#ccc",
-  border: "none",
-  cursor: "pointer",
-  fontWeight: "bold" as const,
-  borderRadius: "4px"
+const pageStyle: React.CSSProperties = {
+  minHeight: "calc(100vh - 64px)",
+  padding: "40px clamp(20px, 8vw, 120px) 64px",
+  backgroundColor: "#f5f7fb"
 };
 
-const bookButtonStyle = {
+const detailShellStyle: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "minmax(280px, 1.05fr) minmax(320px, 0.95fr)",
+  gap: "28px",
+  maxWidth: "1120px",
+  margin: "0 auto"
+};
+
+const mediaPanelStyle: React.CSSProperties = {
+  backgroundColor: "#fff",
+  border: "1px solid #e5e7eb",
+  borderRadius: "8px",
+  boxShadow: "0 10px 28px rgba(15, 23, 42, 0.08)",
+  minHeight: "420px",
+  overflow: "hidden"
+};
+
+const imageStyle: React.CSSProperties = { width: "100%", height: "100%", objectFit: "cover", display: "block" };
+const placeholderStyle: React.CSSProperties = { height: "100%", minHeight: "420px", display: "grid", placeItems: "center", color: "#9ca3af", backgroundColor: "#f3f4f6" };
+
+const infoPanelStyle: React.CSSProperties = {
+  backgroundColor: "#fff",
+  border: "1px solid #e5e7eb",
+  borderRadius: "8px",
+  boxShadow: "0 10px 28px rgba(15, 23, 42, 0.08)",
+  padding: "34px"
+};
+
+const backButtonStyle: React.CSSProperties = {
+  background: "#fff",
+  border: "1px solid #d1d5db",
+  borderRadius: "8px",
+  color: "#374151",
+  cursor: "pointer",
+  fontWeight: 800,
+  margin: "0 auto 20px",
+  display: "block",
+  maxWidth: "1120px",
+  padding: "10px 16px"
+};
+
+const badgeStyle: React.CSSProperties = {
+  backgroundColor: "#ccfbf1",
+  borderRadius: "999px",
+  color: "#0f766e",
   display: "inline-block",
-  backgroundColor: "#000",
+  fontSize: "0.75rem",
+  fontWeight: 900,
+  marginBottom: "18px",
+  padding: "7px 12px"
+};
+
+const titleStyle: React.CSSProperties = { color: "#111827", fontSize: "2.25rem", lineHeight: 1.08, margin: "0 0 10px", fontWeight: 900 };
+const providerStyle: React.CSSProperties = { color: "#6b7280", margin: "0 0 26px" };
+const metaGridStyle: React.CSSProperties = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px", marginBottom: "28px" };
+const metaItemStyle: React.CSSProperties = { backgroundColor: "#f9fafb", border: "1px solid #eef0f3", borderRadius: "8px", padding: "16px" };
+const metaLabelStyle: React.CSSProperties = { color: "#6b7280", display: "block", fontSize: "0.75rem", fontWeight: 800, marginBottom: "8px", textTransform: "uppercase" };
+const metaValueStyle: React.CSSProperties = { color: "#111827", fontSize: "1.5rem", fontWeight: 900 };
+const descriptionBlockStyle: React.CSSProperties = { marginBottom: "30px" };
+const sectionTitleStyle: React.CSSProperties = { color: "#111827", fontSize: "1rem", fontWeight: 900, margin: "0 0 10px" };
+const descriptionStyle: React.CSSProperties = { color: "#4b5563", lineHeight: 1.7, margin: 0 };
+
+const bookButtonStyle: React.CSSProperties = {
+  backgroundColor: "#111827",
+  borderRadius: "8px",
   color: "#fff",
-  padding: "15px 30px",
-  textDecoration: "none",
-  fontWeight: "bold" as const,
-  fontSize: "18px",
-  borderRadius: "4px"
+  display: "block",
+  fontWeight: 900,
+  padding: "15px 18px",
+  textAlign: "center",
+  textDecoration: "none"
+};
+
+const stateStyle: React.CSSProperties = {
+  minHeight: "calc(100vh - 64px)",
+  display: "grid",
+  placeItems: "center",
+  color: "#6b7280"
 };
 
 export default PackageDetail;
