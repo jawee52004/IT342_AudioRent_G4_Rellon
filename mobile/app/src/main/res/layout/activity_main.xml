@@ -10,33 +10,141 @@
         android:id="@+id/welcomeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome to AudioRent!"
+        android:text="AudioRent"
         android:textColor="#1D1D1F"
-        android:textSize="28sp"
+        android:textSize="36sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.4" />
+        android:layout_marginTop="32dp"/>
 
     <TextView
         android:id="@+id/userNameText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Loading user info..."
+        android:layout_marginTop="8dp"
+        android:text="Hello, User!"
         android:textColor="#86868B"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/welcomeText" />
 
+    <!-- Customer Section -->
+    <LinearLayout
+        android:id="@+id/customerSection"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/userNameText">
+
+        <Button
+            android:id="@+id/exploreButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:backgroundTint="#0071E3"
+            android:text="Explore Equipment"
+            android:textAllCaps="false"
+            app:cornerRadius="12dp" />
+
+        <Button
+            android:id="@+id/rentalsButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#FFFFFF"
+            android:text="My Rental History"
+            android:textAllCaps="false"
+            android:textColor="#1D1D1F"
+            app:cornerRadius="12dp"
+            app:strokeColor="#1D1D1F"
+            app:strokeWidth="1dp" />
+    </LinearLayout>
+
+    <!-- Provider Section -->
+    <LinearLayout
+        android:id="@+id/providerSection"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/customerSection">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PROVIDER TOOLS"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="#86868B"
+            android:layout_marginBottom="8dp"/>
+
+        <Button
+            android:id="@+id/managePackagesButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:backgroundTint="#1D1D1F"
+            android:text="Manage My Inventory"
+            android:textAllCaps="false"
+            app:cornerRadius="12dp" />
+            
+        <Button
+            android:id="@+id/providerDashboardButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#FFFFFF"
+            android:text="View Earnings &amp; Orders"
+            android:textAllCaps="false"
+            android:textColor="#1D1D1F"
+            app:cornerRadius="12dp"
+            app:strokeColor="#1D1D1F"
+            app:strokeWidth="1dp" />
+    </LinearLayout>
+
+    <!-- Admin Section -->
+    <LinearLayout
+        android:id="@+id/adminSection"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/providerSection">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ADMIN TOOLS"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="#86868B"
+            android:layout_marginBottom="8dp"/>
+
+        <Button
+            android:id="@+id/adminDashboardButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:backgroundTint="#FF9500"
+            android:text="Admin Dashboard"
+            android:textAllCaps="false"
+            app:cornerRadius="12dp" />
+    </LinearLayout>
+
     <Button
         android:id="@+id/logoutButton"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:layout_marginBottom="48dp"
+        android:layout_marginBottom="32dp"
         android:backgroundTint="#FF3B30"
         android:text="Logout"
         android:textAllCaps="false"
