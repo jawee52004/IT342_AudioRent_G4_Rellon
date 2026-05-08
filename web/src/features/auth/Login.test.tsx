@@ -10,8 +10,8 @@ test('renders login form and allows typing', () => {
   );
 
   // Check if elements are present
-  const emailInput = screen.getByPlaceholderName(/email/i);
-  const passwordInput = screen.getByPlaceholderName(/password/i);
+  const emailInput = screen.getByPlaceholderText(/email/i) as HTMLInputElement;
+  const passwordInput = screen.getByPlaceholderText(/password/i) as HTMLInputElement;
   const loginButton = screen.getByRole('button', { name: /login/i });
 
   // Simulate user typing
