@@ -8,11 +8,11 @@
 		<version>4.0.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.AudioRent</groupId>
-	<artifactId>backend</artifactId>
+	<groupId>edu.rellon</groupId>
+	<artifactId>AudioRent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>backend</name>
-	<description>Demo project for Spring Boot</description>
+	<name>AudioRent</name>
+	<description>AudioRent - Audio Equipment Rental Platform</description>
 	<url/>
 	<licenses>
 		<license/>

@@ -15,20 +15,52 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AudioRent"
         tools:targetApi="31">
+        
         <activity
-            android:name=".MainActivity"
+            android:name="edu.rellon.audiorent.features.packages.PackageListActivity"
             android:exported="false" />
+
         <activity
-            android:name=".RegisterActivity"
+            android:name="edu.rellon.audiorent.features.rental.ProviderEarningsActivity"
             android:exported="false" />
+            
         <activity
-            android:name=".LoginActivity"
+            android:name="edu.rellon.audiorent.features.rental.RentalHistoryActivity"
+            android:exported="false" />
+
+        <activity
+            android:name="edu.rellon.audiorent.features.packages.PackageDetailActivity"
+            android:exported="false" />
+            
+        <activity
+            android:name="edu.rellon.audiorent.features.packages.AddPackageActivity"
+            android:exported="false" />
+
+        <activity
+            android:name="edu.rellon.audiorent.features.auth.AdminDashboardActivity"
+            android:exported="false" />
+            
+        <activity
+            android:name="edu.rellon.audiorent.features.packages.ProviderPackagesActivity"
+            android:exported="false" />
+            
+        <activity
+            android:name="edu.rellon.audiorent.features.auth.MainActivity"
+            android:exported="false" />
+        
+        <activity
+            android:name="edu.rellon.audiorent.features.auth.RegisterActivity"
+            android:exported="false" />
+            
+        <activity
+            android:name="edu.rellon.audiorent.features.auth.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
     </application>
 
 </manifest>
