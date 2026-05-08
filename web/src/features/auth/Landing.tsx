@@ -12,107 +12,124 @@ const Landing: React.FC = () => {
     }
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate("/login");
-  };
-
   return (
     <div style={containerStyle}>
-      <div style={contentCard}>
-        <h2 style={brandStyle}>AUDIORENT</h2>
-        <p style={welcomeStyle}>Welcome back, <strong style={{ color: "#111827" }}>{userName || "Valued User"}</strong></p>
-        
-        <div style={actionGrid}>
-          <button onClick={() => navigate("/packages")} style={primaryBtn}>
-            Browse Equipment
-          </button>
-
-          <button onClick={() => navigate("/my-rentals")} style={secondaryBtn}>
-            Rental History
-          </button>
+      <section style={heroStyle}>
+        <div>
+          <p style={eyebrowStyle}>Customer workspace</p>
+          <h1 style={titleStyle}>Welcome back, {userName || "Valued User"}</h1>
+          <p style={subtitleStyle}>Find event-ready audio packages, review your rental history, and move from planning to booked with less friction.</p>
+          <div style={actionRowStyle}>
+            <button onClick={() => navigate("/packages")} style={primaryBtn}>Browse Equipment</button>
+            <button onClick={() => navigate("/my-rentals")} style={secondaryBtn}>Rental History</button>
+          </div>
         </div>
+      </section>
 
-        <button onClick={handleLogout} style={logoutButtonStyle}>
-          Logout
-        </button>
-      </div>
+      <section style={quickGridStyle}>
+        <article style={quickCardStyle}>
+          <span style={statStyle}>01</span>
+          <h2 style={cardTitleStyle}>Choose a package</h2>
+          <p style={cardCopyStyle}>Search by package name or category and compare available sound system bundles.</p>
+        </article>
+        <article style={quickCardStyle}>
+          <span style={statStyle}>02</span>
+          <h2 style={cardTitleStyle}>Pick rental dates</h2>
+          <p style={cardCopyStyle}>Check availability before confirming your booking request.</p>
+        </article>
+        <article style={quickCardStyle}>
+          <span style={statStyle}>03</span>
+          <h2 style={cardTitleStyle}>Track status</h2>
+          <p style={cardCopyStyle}>Follow pending, confirmed, and completed rentals from your history page.</p>
+        </article>
+      </section>
     </div>
   );
 };
 
-// --- Styles ---
-
 const containerStyle: React.CSSProperties = {
-  backgroundColor: "#f9fafb",
-  minHeight: "100vh",
-  display: "flex",
-  justifyContent: "center",
+  minHeight: "calc(100vh - 64px)",
+  padding: "42px clamp(20px, 8vw, 120px) 64px",
+  backgroundColor: "#f5f7fb"
+};
+
+const heroStyle: React.CSSProperties = {
+  background: "linear-gradient(135deg, #111827 0%, #1f2937 58%, #0f766e 100%)",
+  borderRadius: "8px",
+  color: "#fff",
+  display: "grid",
+  minHeight: "360px",
+  padding: "56px",
   alignItems: "center",
-  padding: "20px",
-  fontFamily: "'Outfit', sans-serif"
+  boxShadow: "0 20px 45px rgba(15, 23, 42, 0.18)"
 };
 
-const contentCard: React.CSSProperties = {
-  maxWidth: "480px",
-  width: "100%",
-  backgroundColor: "#fff",
-  padding: "60px 40px",
-  borderRadius: "32px",
-  textAlign: "center",
-  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)"
+const eyebrowStyle: React.CSSProperties = {
+  color: "#99f6e4",
+  fontSize: "0.78rem",
+  fontWeight: 900,
+  letterSpacing: "0.08em",
+  margin: "0 0 14px",
+  textTransform: "uppercase"
 };
 
-const brandStyle: React.CSSProperties = { 
-  fontSize: "2.5rem", 
-  fontWeight: "900", 
-  letterSpacing: "4px", 
-  color: "#111827",
-  marginBottom: "12px"
+const titleStyle: React.CSSProperties = {
+  fontSize: "clamp(2.1rem, 5vw, 4rem)",
+  fontWeight: 900,
+  lineHeight: 1,
+  margin: "0 0 18px",
+  maxWidth: "780px"
 };
 
-const welcomeStyle: React.CSSProperties = { 
-  color: "#6b7280", 
-  fontSize: "1.125rem",
-  marginBottom: "48px"
+const subtitleStyle: React.CSSProperties = {
+  color: "#d1d5db",
+  fontSize: "1.04rem",
+  lineHeight: 1.7,
+  margin: 0,
+  maxWidth: "620px"
 };
 
-const actionGrid: React.CSSProperties = { 
-  display: "flex", 
-  flexDirection: "column", 
-  gap: "16px",
-  marginBottom: "40px"
+const actionRowStyle: React.CSSProperties = {
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "14px",
+  marginTop: "32px"
 };
 
 const primaryBtn: React.CSSProperties = {
-  padding: "18px",
-  backgroundColor: "#111827",
-  color: "#fff",
+  backgroundColor: "#fff",
   border: "none",
-  borderRadius: "16px",
-  fontSize: "1rem",
-  fontWeight: "700",
+  borderRadius: "8px",
+  color: "#111827",
   cursor: "pointer",
-  transition: "transform 0.1s"
+  fontWeight: 900,
+  padding: "14px 22px"
 };
 
 const secondaryBtn: React.CSSProperties = {
   ...primaryBtn,
+  backgroundColor: "transparent",
+  border: "1px solid rgba(255,255,255,0.32)",
+  color: "#fff"
+};
+
+const quickGridStyle: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+  gap: "18px",
+  marginTop: "22px"
+};
+
+const quickCardStyle: React.CSSProperties = {
   backgroundColor: "#fff",
-  color: "#111827",
-  border: "2px solid #f3f4f6"
+  border: "1px solid #e5e7eb",
+  borderRadius: "8px",
+  boxShadow: "0 10px 28px rgba(15, 23, 42, 0.06)",
+  padding: "24px"
 };
 
-const logoutButtonStyle: React.CSSProperties = {
-  padding: "12px 24px",
-  backgroundColor: "#ef4444",
-  color: "#fff",
-  border: "none",
-  borderRadius: "12px",
-  cursor: "pointer",
-  fontWeight: "700",
-  fontSize: "0.875rem",
-  transition: "all 0.2s"
-};
+const statStyle: React.CSSProperties = { color: "#0f766e", fontSize: "0.78rem", fontWeight: 900 };
+const cardTitleStyle: React.CSSProperties = { color: "#111827", fontSize: "1.05rem", margin: "10px 0 8px", fontWeight: 900 };
+const cardCopyStyle: React.CSSProperties = { color: "#6b7280", lineHeight: 1.6, margin: 0 };
 
-export default Landing;
+export default Landing;

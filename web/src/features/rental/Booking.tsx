@@ -183,19 +183,19 @@ const Booking: React.FC = () => {
 // --- Styles ---
 
 const containerStyle: React.CSSProperties = {
-  backgroundColor: "#f9fafb",
+  backgroundColor: "#f5f7fb",
   minHeight: "100vh",
   padding: "60px 20px",
   display: "flex",
   justifyContent: "center",
-  fontFamily: "'Outfit', sans-serif"
+  fontFamily: "Inter, Arial, sans-serif"
 };
 
 const bookingCard: React.CSSProperties = {
   maxWidth: "520px",
   width: "100%",
   backgroundColor: "#fff",
-  borderRadius: "32px",
+  borderRadius: "8px",
   padding: "40px",
   boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.05)"
 };
@@ -218,7 +218,7 @@ const errorAlert: React.CSSProperties = {
   padding: "16px",
   backgroundColor: "#fef2f2",
   color: "#dc2626",
-  borderRadius: "16px",
+  borderRadius: "8px",
   fontSize: "0.875rem",
   fontWeight: "600",
   marginBottom: "24px",
@@ -231,7 +231,7 @@ const labelStyle: React.CSSProperties = { fontSize: "0.75rem", fontWeight: "700"
 
 const inputStyle: React.CSSProperties = {
   padding: "14px",
-  borderRadius: "12px",
+  borderRadius: "8px",
   border: "1px solid #e5e7eb",
   fontSize: "1rem",
   fontFamily: "inherit"
@@ -246,7 +246,7 @@ const textareaStyle: React.CSSProperties = {
 const summaryBox: React.CSSProperties = {
   padding: "24px",
   backgroundColor: "#f9fafb",
-  borderRadius: "20px",
+  borderRadius: "8px",
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center"
@@ -260,7 +260,7 @@ const submitBtn: React.CSSProperties = {
   backgroundColor: "#111827",
   color: "#fff",
   border: "none",
-  borderRadius: "16px",
+  borderRadius: "8px",
   fontSize: "1rem",
   fontWeight: "700",
   cursor: "pointer",
@@ -273,7 +273,7 @@ const loadingOverlay: React.CSSProperties = {
   justifyContent: "center",
   alignItems: "center",
   fontSize: "1.125rem",
-  fontFamily: "'Outfit', sans-serif"
+  fontFamily: "Inter, Arial, sans-serif"
 };
 
 export default Booking;

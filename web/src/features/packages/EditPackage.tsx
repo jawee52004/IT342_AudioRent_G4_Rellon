@@ -89,7 +89,7 @@ const EditPackage: React.FC = () => {
   return (
     <div style={containerStyle}>
       <div style={cardStyle}>
-        <button onClick={() => navigate(-1)} style={backBtnStyle}>← Back</button>
+        <button onClick={() => navigate(-1)} style={backBtnStyle}>Back</button>
         <h2 style={titleStyle}>Edit Listing</h2>
         <p style={subtitleStyle}>Update your equipment details and pricing.</p>
 
@@ -189,10 +189,10 @@ const EditPackage: React.FC = () => {
 // --- Styles ---
 
 const containerStyle: React.CSSProperties = {
-  backgroundColor: "#f9fafb",
+  backgroundColor: "#f5f7fb",
   minHeight: "100vh",
   padding: "60px 20px",
-  fontFamily: "'Outfit', sans-serif"
+  fontFamily: "Inter, Arial, sans-serif"
 };
 
 const cardStyle: React.CSSProperties = {
@@ -200,7 +200,7 @@ const cardStyle: React.CSSProperties = {
   margin: "0 auto",
   backgroundColor: "#fff",
   padding: "40px",
-  borderRadius: "24px",
+  borderRadius: "8px",
   boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
 };
 
@@ -221,7 +221,7 @@ const errorStyle: React.CSSProperties = {
   backgroundColor: "#fef2f2",
   color: "#b91c1c",
   padding: "12px",
-  borderRadius: "12px",
+  borderRadius: "8px",
   marginBottom: "20px",
   textAlign: "center",
   fontSize: "0.875rem",
@@ -234,7 +234,7 @@ const labelStyle: React.CSSProperties = { fontSize: "0.875rem", fontWeight: "600
 
 const inputStyle: React.CSSProperties = {
   padding: "14px",
-  borderRadius: "12px",
+  borderRadius: "8px",
   border: "1px solid #e5e7eb",
   fontSize: "1rem",
   color: "#111827",
@@ -248,7 +248,7 @@ const rowStyle: React.CSSProperties = { display: "flex", gap: "20px" };
 const fileUploadWrapper: React.CSSProperties = {
   border: "2px dashed #e5e7eb",
   padding: "20px",
-  borderRadius: "12px",
+  borderRadius: "8px",
   textAlign: "center",
   backgroundColor: "#f9fafb"
 };
@@ -262,7 +262,7 @@ const submitBtnStyle: React.CSSProperties = {
   backgroundColor: "#111827",
   color: "#fff",
   border: "none",
-  borderRadius: "14px",
+  borderRadius: "8px",
   fontSize: "1rem",
   fontWeight: "700",
   cursor: "pointer",

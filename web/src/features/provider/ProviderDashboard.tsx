@@ -58,123 +58,131 @@ const ProviderDashboard: React.FC = () => {
     navigate("/login");
   };
 
+  const pendingCount = rentals.filter(r => r.status === "PENDING").length;
+  const confirmedCount = rentals.filter(r => r.status === "CONFIRMED").length;
   const activeRentals = rentals.filter(r => r.status === "PENDING" || r.status === "CONFIRMED");
-  
-  const currentlyRentedCount = activeRentals.length;
-
-  const packageUsage = rentals.reduce((acc: any, r) => {
-    if (r.status === "CONFIRMED") {
-      acc[r.packageName] = (acc[r.packageName] || 0) + 1;
-    }
-    return acc;
-  }, {});
-
   const totalEarnings = rentals
     .filter(r => r.status === "COMPLETED")
     .reduce((sum, r) => sum + r.totalPrice, 0);
 
+  const packageUsage = rentals.reduce((acc: Record<string, number>, rental) => {
+    if (rental.status === "CONFIRMED") {
+      acc[rental.packageName] = (acc[rental.packageName] || 0) + 1;
+    }
+    return acc;
+  }, {});
+
   if (loading) return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", backgroundColor: "#f8f9fa" }}>
-      <div>Loading Provider Dashboard...</div>
+    <div style={loadingStyle}>
+      <div>Loading provider dashboard...</div>
     </div>
   );
 
   return (
     <div style={containerStyle}>
-      <header style={headerStyle}>
+      <header style={heroStyle}>
         <div>
-          <h1 style={titleStyle}>PROVIDER DASHBOARD</h1>
-          <p style={subtitleStyle}>Welcome back, {userName || "Partner"}</p>
+          <p style={eyebrowStyle}>Provider workspace</p>
+          <h1 style={titleStyle}>Welcome back, {userName || "Partner"}</h1>
+          <p style={subtitleStyle}>Review bookings, manage availability, and keep your equipment listings ready for renters.</p>
         </div>
-        <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
-           <button onClick={() => navigate("/my-packages")} style={secondaryBtn}>Manage Inventory</button>
-           <button onClick={handleLogout} style={logoutButtonStyle}>Logout</button>
+        <div style={heroActionsStyle}>
+          <button onClick={() => navigate("/my-packages")} style={primaryButtonStyle}>Manage Inventory</button>
+          <button onClick={handleLogout} style={secondaryButtonStyle}>Logout</button>
         </div>
       </header>
 
-      <div style={statsGrid}>
-        <div style={statCard}>
-          <h4 style={statLabel}>Current Occupancy</h4>
-          <p style={statNumber}>{activeRentals.length}</p>
+      <section style={statsGridStyle}>
+        <div style={statCardStyle}>
+          <span style={statLabelStyle}>Pending Requests</span>
+          <strong style={statNumberStyle}>{pendingCount}</strong>
         </div>
-        <div style={statCard}>
-          <h4 style={statLabel}>Total Earnings</h4>
-          <p style={statNumber}>${totalEarnings.toFixed(2)}</p>
+        <div style={statCardStyle}>
+          <span style={statLabelStyle}>Confirmed Rentals</span>
+          <strong style={statNumberStyle}>{confirmedCount}</strong>
         </div>
-        <div style={statCard}>
-          <h4 style={statLabel}>Inventory Out</h4>
-          <p style={statNumber}>{currentlyRentedCount} units</p>
+        <div style={statCardStyle}>
+          <span style={statLabelStyle}>Completed Earnings</span>
+          <strong style={statNumberStyle}>${totalEarnings.toFixed(2)}</strong>
         </div>
-      </div>
+      </section>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", marginBottom: "40px" }}>
-        <div style={sectionCard}>
-          <h3 style={sectionTitle}>Current Inventory Status</h3>
-          <ul style={inventoryList}>
-             {Object.entries(packageUsage).map(([name, count]: [string, any]) => (
-               <li key={name} style={inventoryItem}>
-                  <span>{name}</span>
-                  <span style={(count as number) > 0 ? rentedTag : availableTag}>
-                    {`${count} out`}
-                  </span>
-               </li>
-             ))}
-             {Object.keys(packageUsage).length === 0 && (
-               <p style={{ color: "#9ca3af", textAlign: "center" }}>No inventory data.</p>
-             )}
-          </ul>
-        </div>
-        <div style={sectionCard}>
-          <h3 style={sectionTitle}>Revenue Insights</h3>
-          <p style={{ color: "#6b7280", fontSize: "0.95rem" }}>All payments are processed securely via PayMongo.</p>
-          <div style={{ marginTop: "24px", padding: "20px", backgroundColor: "#f9fafb", borderRadius: "16px" }}>
-            <span style={{ fontSize: "0.75rem", fontWeight: "700", color: "#9ca3af", textTransform: "uppercase" }}>Estimated Next Payout</span>
-            <p style={{ fontSize: "1.5rem", fontWeight: "800", color: "#111827", margin: "4px 0 0 0" }}>${(totalEarnings * 0.95).toFixed(2)}</p>
-            <p style={{ fontSize: "0.75rem", color: "#9ca3af", marginTop: "4px" }}>5% platform fee applied</p>
+      <section style={insightGridStyle}>
+        <article style={sectionCardStyle}>
+          <div style={sectionHeaderStyle}>
+            <h2 style={sectionTitleStyle}>Inventory Out</h2>
+            <span style={pillStyle}>{activeRentals.length} active</span>
           </div>
-        </div>
-      </div>
+          <ul style={inventoryListStyle}>
+            {Object.entries(packageUsage).map(([name, count]) => (
+              <li key={name} style={inventoryItemStyle}>
+                <span>{name}</span>
+                <strong style={warningTagStyle}>{count} out</strong>
+              </li>
+            ))}
+            {Object.keys(packageUsage).length === 0 && (
+              <li style={emptyInlineStyle}>No confirmed rentals are currently out.</li>
+            )}
+          </ul>
+        </article>
 
-      <div style={sectionCard}>
-        <h3 style={sectionTitle}>Active & Pending Rentals</h3>
-        <div style={tableWrapper}>
+        <article style={sectionCardStyle}>
+          <div style={sectionHeaderStyle}>
+            <h2 style={sectionTitleStyle}>Revenue Snapshot</h2>
+            <span style={pillStyle}>PayMongo</span>
+          </div>
+          <p style={mutedTextStyle}>Estimated payout after the platform fee is applied.</p>
+          <div style={payoutBoxStyle}>
+            <span style={statLabelStyle}>Estimated Next Payout</span>
+            <strong style={payoutValueStyle}>${(totalEarnings * 0.95).toFixed(2)}</strong>
+            <small style={mutedSmallStyle}>5% platform fee applied</small>
+          </div>
+        </article>
+      </section>
+
+      <section style={sectionCardStyle}>
+        <div style={sectionHeaderStyle}>
+          <h2 style={sectionTitleStyle}>Rental Requests</h2>
+          <span style={pillStyle}>{rentals.length} total</span>
+        </div>
+        <div style={tableWrapperStyle}>
           <table style={tableStyle}>
             <thead>
               <tr>
-                <th>Item</th>
-                <th>Customer</th>
-                <th>Duration</th>
-                <th>Earnings</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th style={thStyle}>Item</th>
+                <th style={thStyle}>Customer</th>
+                <th style={thStyle}>Duration</th>
+                <th style={thStyle}>Earnings</th>
+                <th style={thStyle}>Status</th>
+                <th style={thStyle}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {rentals.map(rental => (
                 <tr key={rental.id}>
-                  <td>
-                    <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <td style={tdStyle}>
+                    <div style={itemCellStyle}>
                       {rental.packageImageUrl ? (
-                        <img src={rental.packageImageUrl} alt={rental.packageName} style={tableCellImg} />
+                        <img src={rental.packageImageUrl} alt={rental.packageName} style={tableCellImgStyle} />
                       ) : (
-                        <div style={tableCellImgPlaceholder} />
+                        <div style={tableCellImgPlaceholderStyle} />
                       )}
                       <strong>{rental.packageName}</strong>
                     </div>
                   </td>
-                  <td>{rental.customerName}</td>
-                  <td>{rental.startDate} to {rental.endDate}</td>
-                  <td>${rental.totalPrice.toFixed(2)}</td>
-                  <td><span style={getStatusStyle(rental.status)}>{rental.status}</span></td>
-                  <td>
+                  <td style={tdStyle}>{rental.customerName}</td>
+                  <td style={tdStyle}>{rental.startDate} to {rental.endDate}</td>
+                  <td style={tdStyle}>${rental.totalPrice.toFixed(2)}</td>
+                  <td style={tdStyle}><span style={getStatusStyle(rental.status)}>{rental.status}</span></td>
+                  <td style={tdStyle}>
                     {rental.status === "PENDING" && (
-                      <button onClick={() => handleStatusUpdate(rental.id, "CONFIRMED")} style={actionButtonStyle}>Confirm</button>
+                      <button onClick={() => handleStatusUpdate(rental.id, "CONFIRMED")} style={confirmButtonStyle}>Confirm</button>
                     )}
                     {rental.status === "CONFIRMED" && (
-                      <button 
-                        onClick={() => handleStatusUpdate(rental.id, "COMPLETED")} 
+                      <button
+                        onClick={() => handleStatusUpdate(rental.id, "COMPLETED")}
                         disabled={new Date(rental.endDate) >= new Date()}
-                        style={new Date(rental.endDate) >= new Date() ? disabledButtonStyle : successButtonStyle}
+                        style={new Date(rental.endDate) >= new Date() ? disabledButtonStyle : completeButtonStyle}
                         title={new Date(rental.endDate) >= new Date() ? "Cannot complete until rental period ends" : "Mark as returned"}
                       >
                         Complete
@@ -185,29 +193,26 @@ const ProviderDashboard: React.FC = () => {
               ))}
               {rentals.length === 0 && (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: "center", padding: "40px", color: "#666" }}>
-                    No rental requests found yet.
-                  </td>
+                  <td colSpan={6} style={emptyTableStyle}>No rental requests found yet.</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
     </div>
   );
 };
 
-// --- Helper Functions ---
-
 const getStatusStyle = (status: string): React.CSSProperties => {
   const base: React.CSSProperties = {
-    padding: "4px 10px",
-    borderRadius: "20px",
-    fontSize: "12px",
-    fontWeight: "bold",
+    borderRadius: "999px",
+    fontSize: "0.72rem",
+    fontWeight: 900,
+    padding: "5px 10px",
     textTransform: "uppercase"
   };
+
   switch (status) {
     case "PENDING": return { ...base, backgroundColor: "#fffbeb", color: "#92400e" };
     case "CONFIRMED": return { ...base, backgroundColor: "#eff6ff", color: "#1e40af" };
@@ -217,189 +222,111 @@ const getStatusStyle = (status: string): React.CSSProperties => {
   }
 };
 
-// --- Styles ---
-
 const containerStyle: React.CSSProperties = {
-  padding: "40px",
-  backgroundColor: "#f9fafb",
+  backgroundColor: "#f5f7fb",
   minHeight: "100vh",
-  fontFamily: "'Outfit', sans-serif"
+  padding: "40px clamp(20px, 5vw, 72px) 64px",
+  fontFamily: "Inter, Arial, sans-serif"
 };
 
-const headerStyle: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
+const heroStyle: React.CSSProperties = {
   alignItems: "center",
-  marginBottom: "40px"
-};
-
-const titleStyle: React.CSSProperties = {
-  fontSize: "2.5rem",
-  fontWeight: "900",
-  margin: 0,
-  background: "linear-gradient(45deg, #000, #444)",
-  WebkitBackgroundClip: "text",
-  WebkitTextFillColor: "transparent"
-};
-
-const subtitleStyle: React.CSSProperties = { color: "#6b7280", margin: "5px 0 0" };
-
-const logoutButtonStyle: React.CSSProperties = {
-  padding: "10px 20px",
-  backgroundColor: "#ef4444",
+  background: "linear-gradient(135deg, #111827 0%, #1f2937 58%, #0f766e 100%)",
+  borderRadius: "8px",
+  boxShadow: "0 20px 45px rgba(15, 23, 42, 0.16)",
   color: "#fff",
-  border: "none",
-  borderRadius: "12px",
-  cursor: "pointer",
-  fontWeight: "700",
-  fontSize: "0.875rem",
-  transition: "all 0.2s"
+  display: "flex",
+  gap: "28px",
+  justifyContent: "space-between",
+  marginBottom: "24px",
+  padding: "38px"
 };
 
-const secondaryBtn: React.CSSProperties = {
-  padding: "10px 20px",
-  backgroundColor: "#f3f4f6",
-  color: "#374151",
+const eyebrowStyle: React.CSSProperties = {
+  color: "#99f6e4",
+  fontSize: "0.78rem",
+  fontWeight: 900,
+  letterSpacing: "0.08em",
+  margin: "0 0 10px",
+  textTransform: "uppercase"
+};
+
+const titleStyle: React.CSSProperties = { fontSize: "clamp(2rem, 4vw, 3.2rem)", fontWeight: 900, lineHeight: 1.05, margin: "0 0 12px" };
+const subtitleStyle: React.CSSProperties = { color: "#d1d5db", lineHeight: 1.65, margin: 0, maxWidth: "640px" };
+const heroActionsStyle: React.CSSProperties = { display: "flex", flexWrap: "wrap", gap: "12px", justifyContent: "flex-end" };
+
+const primaryButtonStyle: React.CSSProperties = {
+  backgroundColor: "#fff",
   border: "none",
-  borderRadius: "12px",
+  borderRadius: "8px",
+  color: "#111827",
   cursor: "pointer",
-  fontWeight: "700",
-  fontSize: "0.875rem"
+  fontWeight: 900,
+  padding: "13px 18px"
 };
 
 const secondaryButtonStyle: React.CSSProperties = {
-  ...secondaryBtn,
-  backgroundColor: "#fff",
-  border: "1px solid #e5e7eb"
+  ...primaryButtonStyle,
+  backgroundColor: "transparent",
+  border: "1px solid rgba(255,255,255,0.32)",
+  color: "#fff"
 };
 
-const statsGrid: React.CSSProperties = {
+const statsGridStyle: React.CSSProperties = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-  gap: "24px",
-  marginBottom: "40px"
+  gap: "18px",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  marginBottom: "18px"
 };
 
-const statCard: React.CSSProperties = {
-  padding: "24px",
+const statCardStyle: React.CSSProperties = {
   backgroundColor: "#fff",
-  borderRadius: "16px",
-  boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
-  border: "1px solid #f3f4f6"
-};
-
-const statLabel: React.CSSProperties = { margin: 0, color: "#6b7280", fontSize: "0.875rem", fontWeight: "600" };
-const statNumber: React.CSSProperties = { fontSize: "2rem", fontWeight: "800", margin: "8px 0 0", color: "#111827" };
-
-const mainContentStyle: React.CSSProperties = {
-  backgroundColor: "#fff",
-  borderRadius: "20px",
-  boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
-  border: "1px solid #f3f4f6",
-  overflow: "hidden"
-};
-
-const tableHeader: React.CSSProperties = { padding: "24px", borderBottom: "1px solid #f3f4f6", backgroundColor: "#fff" };
-const tableWrapper: React.CSSProperties = { overflowX: "auto" };
-const tableStyle: React.CSSProperties = { width: "100%", borderCollapse: "collapse", textAlign: "left" };
-
-const actionButtonStyle: React.CSSProperties = {
-  padding: "6px 12px",
-  backgroundColor: "#3b82f6",
-  color: "#fff",
-  border: "none",
-  borderRadius: "6px",
-  cursor: "pointer",
-  fontSize: "12px",
-  fontWeight: "600",
-  marginRight: "5px"
-};
-
-const successButtonStyle: React.CSSProperties = {
-  ...actionButtonStyle,
-  backgroundColor: "#10b981"
-};
-
-const disabledButtonStyle: React.CSSProperties = {
-  ...actionButtonStyle,
-  backgroundColor: "#e5e7eb",
-  color: "#9ca3af",
-  cursor: "not-allowed"
-};
-
-const sectionCard: React.CSSProperties = {
-  padding: "24px",
-  backgroundColor: "#fff",
-  borderRadius: "16px",
-  boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
-  border: "1px solid #f3f4f6"
-};
-
-const sectionTitle: React.CSSProperties = {
-  margin: "0 0 20px 0",
-  fontSize: "1.1rem",
-  fontWeight: "700",
-  color: "#111827"
-};
-
-const inventoryList: React.CSSProperties = {
-  listStyle: "none",
-  padding: 0,
-  margin: 0
-};
-
-const inventoryItem: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "space-between",
-  padding: "12px 0",
-  borderBottom: "1px solid #f3f4f6",
-  fontSize: "0.9rem",
-  fontWeight: "500"
-};
-
-const rentedTag: React.CSSProperties = {
-  color: "#991b1b",
-  backgroundColor: "#fef2f2",
-  padding: "2px 8px",
-  borderRadius: "12px",
-  fontSize: "0.75rem",
-  fontWeight: "bold"
-};
-
-const availableTag: React.CSSProperties = {
-  ...rentedTag,
-  color: "#065f46",
-  backgroundColor: "#ecfdf5"
-};
-
-const actionBtnStyle: React.CSSProperties = {
-  padding: "12px",
-  backgroundColor: "#111827",
-  color: "#fff",
-  border: "none",
-  borderRadius: "10px",
-  cursor: "pointer",
-  fontWeight: "600",
-  textAlign: "center"
-};
-
-const secondaryActionBtnStyle: React.CSSProperties = {
-  ...actionBtnStyle,
-  backgroundColor: "#fff",
-  color: "#111827",
-  border: "1px solid #e5e7eb"
-};
-
-const tableCellImg: React.CSSProperties = {
-  width: "40px",
-  height: "40px",
+  border: "1px solid #e5e7eb",
   borderRadius: "8px",
-  objectFit: "cover"
+  boxShadow: "0 10px 28px rgba(15, 23, 42, 0.06)",
+  padding: "22px"
 };
 
-const tableCellImgPlaceholder: React.CSSProperties = {
-  ...tableCellImg,
-  backgroundColor: "#f3f4f6"
+const statLabelStyle: React.CSSProperties = { color: "#6b7280", display: "block", fontSize: "0.78rem", fontWeight: 900, textTransform: "uppercase" };
+const statNumberStyle: React.CSSProperties = { color: "#111827", display: "block", fontSize: "2rem", marginTop: "8px" };
+
+const insightGridStyle: React.CSSProperties = {
+  display: "grid",
+  gap: "18px",
+  gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+  marginBottom: "18px"
 };
+
+const sectionCardStyle: React.CSSProperties = {
+  backgroundColor: "#fff",
+  border: "1px solid #e5e7eb",
+  borderRadius: "8px",
+  boxShadow: "0 10px 28px rgba(15, 23, 42, 0.06)",
+  padding: "24px"
+};
+
+const sectionHeaderStyle: React.CSSProperties = { alignItems: "center", display: "flex", gap: "14px", justifyContent: "space-between", marginBottom: "18px" };
+const sectionTitleStyle: React.CSSProperties = { color: "#111827", fontSize: "1.1rem", fontWeight: 900, margin: 0 };
+const pillStyle: React.CSSProperties = { backgroundColor: "#f3f4f6", borderRadius: "999px", color: "#4b5563", fontSize: "0.75rem", fontWeight: 900, padding: "6px 10px" };
+const inventoryListStyle: React.CSSProperties = { listStyle: "none", margin: 0, padding: 0 };
+const inventoryItemStyle: React.CSSProperties = { alignItems: "center", borderBottom: "1px solid #f3f4f6", display: "flex", gap: "12px", justifyContent: "space-between", padding: "12px 0" };
+const warningTagStyle: React.CSSProperties = { backgroundColor: "#fef2f2", borderRadius: "999px", color: "#991b1b", fontSize: "0.75rem", padding: "5px 10px" };
+const emptyInlineStyle: React.CSSProperties = { color: "#9ca3af", padding: "16px 0" };
+const mutedTextStyle: React.CSSProperties = { color: "#6b7280", lineHeight: 1.6, margin: "0 0 18px" };
+const payoutBoxStyle: React.CSSProperties = { backgroundColor: "#f9fafb", border: "1px solid #eef0f3", borderRadius: "8px", padding: "18px" };
+const payoutValueStyle: React.CSSProperties = { color: "#111827", display: "block", fontSize: "1.65rem", marginTop: "8px" };
+const mutedSmallStyle: React.CSSProperties = { color: "#9ca3af", display: "block", marginTop: "6px" };
+const tableWrapperStyle: React.CSSProperties = { overflowX: "auto" };
+const tableStyle: React.CSSProperties = { borderCollapse: "collapse", textAlign: "left", width: "100%" };
+const thStyle: React.CSSProperties = { borderBottom: "1px solid #e5e7eb", color: "#6b7280", fontSize: "0.74rem", fontWeight: 900, padding: "12px", textTransform: "uppercase" };
+const tdStyle: React.CSSProperties = { borderBottom: "1px solid #f3f4f6", color: "#374151", padding: "14px 12px", verticalAlign: "middle" };
+const itemCellStyle: React.CSSProperties = { alignItems: "center", display: "flex", gap: "12px" };
+const tableCellImgStyle: React.CSSProperties = { borderRadius: "8px", height: "44px", objectFit: "cover", width: "44px" };
+const tableCellImgPlaceholderStyle: React.CSSProperties = { ...tableCellImgStyle, backgroundColor: "#f3f4f6" };
+const confirmButtonStyle: React.CSSProperties = { backgroundColor: "#111827", border: "none", borderRadius: "8px", color: "#fff", cursor: "pointer", fontSize: "0.8rem", fontWeight: 900, padding: "8px 12px" };
+const completeButtonStyle: React.CSSProperties = { ...confirmButtonStyle, backgroundColor: "#0f766e" };
+const disabledButtonStyle: React.CSSProperties = { ...confirmButtonStyle, backgroundColor: "#e5e7eb", color: "#9ca3af", cursor: "not-allowed" };
+const emptyTableStyle: React.CSSProperties = { color: "#9ca3af", padding: "42px", textAlign: "center" };
+const loadingStyle: React.CSSProperties = { alignItems: "center", backgroundColor: "#f5f7fb", display: "flex", height: "100vh", justifyContent: "center" };
 
 export default ProviderDashboard;

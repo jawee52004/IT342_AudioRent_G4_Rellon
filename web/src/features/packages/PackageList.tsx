@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import api from "../../common/api";
 
 interface Package {
   id: string;
   name: string;
+  description?: string;
   price: number;
   category: string;
+  quantity?: number;
   imageUrls: string[];
 }
 
@@ -16,7 +18,7 @@ const PackageList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchPackages = async () => {
@@ -33,61 +35,90 @@ const PackageList: React.FC = () => {
     fetchPackages();
   }, []);
 
-  const handleFilter = (category: string) => {
-    setSelectedCategory(category);
-    if (category === "All") {
-      setFilteredPackages(packages);
-    } else {
-      setFilteredPackages(packages.filter(p => p.category === category));
-    }
-  };
+  useEffect(() => {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const nextPackages = packages.filter((pkg) => {
+      if (pkg.category === "Speakers") return false;
+      const matchesCategory = selectedCategory === "All" || pkg.category === selectedCategory;
+      const searchableText = `${pkg.name} ${pkg.category} ${pkg.description ?? ""}`.toLowerCase();
+      return matchesCategory && searchableText.includes(normalizedSearch);
+    });
 
-  const categories = ["All", "Basic (Small Events)", "Standard (Medium Events)", "Professional (Large Events)"];
+    setFilteredPackages(nextPackages);
+  }, [packages, searchTerm, selectedCategory]);
+
+  const categories = [
+    "All",
+    ...Array.from(new Set(packages.map(pkg => pkg.category).filter(Boolean))).filter(category => category !== "Speakers")
+  ];
 
   return (
     <div style={containerStyle}>
-      <header style={headerStyle}>
-        <button onClick={() => navigate(-1)} style={backBtnStyle}>← Back</button>
-        <h1 style={titleStyle}>Discover Premium Audio Gear</h1>
-        <p style={subtitleStyle}>Professional sound solutions for every occasion.</p>
+      <header style={pageHeaderStyle}>
+        <p style={eyebrowStyle}>Browse packages</p>
+        <h1 style={pageTitleStyle}>Find a sound system for your event</h1>
+        <p style={pageSubtitleStyle}>Search available audio packages and filter by event size or category.</p>
       </header>
 
-      <div style={filterContainer}>
-        {categories.map(cat => (
-          <button 
-            key={cat} 
-            onClick={() => handleFilter(cat)}
-            style={selectedCategory === cat ? activeFilterBtn : filterBtn}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-      
+      <section style={toolbarStyle}>
+        <input
+          aria-label="Search packages"
+          value={searchTerm}
+          onChange={(event) => setSearchTerm(event.target.value)}
+          placeholder="Search sound system packages..."
+          style={searchInputStyle}
+        />
+        <select
+          aria-label="Filter by category"
+          value={selectedCategory}
+          onChange={(event) => setSelectedCategory(event.target.value)}
+          style={selectStyle}
+        >
+          {categories.map(cat => (
+            <option key={cat} value={cat}>
+              {cat === "All" ? "All Categories" : cat}
+            </option>
+          ))}
+        </select>
+      </section>
+
       {loading && <div style={msgBox}>Loading available equipment...</div>}
       {error && <div style={{ ...msgBox, color: "#dc2626" }}>{error}</div>}
-      
-      <div style={gridStyle}>
-        {filteredPackages.map((pkg) => (
-          <div key={pkg.id} style={cardStyle}>
-            {pkg.imageUrls && pkg.imageUrls.length > 0 ? (
-              <img src={pkg.imageUrls[0]} alt={pkg.name} style={imageStyle} />
-            ) : (
-              <div style={placeholderStyle}>No Image</div>
-            )}
-            <div style={cardInfo}>
-              <span style={categoryBadge}>{pkg.category}</span>
-              <h3 style={pkgTitle}>{pkg.name}</h3>
-              <div style={priceRow}>
-                <span style={priceText}>${pkg.price.toFixed(2)}</span>
-                <span style={perDay}>/ day</span>
+
+      <main style={contentStyle}>
+        <div style={sectionHeaderStyle}>
+          <h1 style={titleStyle}>Available Packages</h1>
+          <span style={countStyle}>{filteredPackages.length} shown</span>
+        </div>
+
+        <div style={gridStyle}>
+          {filteredPackages.map((pkg) => (
+            <Link key={pkg.id} to={`/packages/${pkg.id}`} style={cardStyle}>
+              <div style={imageWrapStyle}>
+                {pkg.imageUrls && pkg.imageUrls.length > 0 ? (
+                  <img src={pkg.imageUrls[0]} alt={pkg.name} style={imageStyle} />
+                ) : (
+                  <div style={placeholderStyle}>No Image</div>
+                )}
+                <span style={availabilityBadge}>
+                  {pkg.quantity === 0 ? "Unavailable" : "Available"}
+                </span>
               </div>
-              <Link to={`/packages/${pkg.id}`} style={detailsBtn}>View Selection</Link>
-            </div>
-          </div>
-        ))}
-      </div>
-      
+              <div style={cardInfo}>
+                <h2 style={pkgTitle}>{pkg.name}</h2>
+                <p style={descriptionStyle}>
+                  {pkg.description || `Professional audio package for ${pkg.category.toLowerCase()}.`}
+                </p>
+                <div style={cardFooterStyle}>
+                  <span style={categoryText}>{pkg.category}</span>
+                  <span style={detailsText}>View</span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </main>
+
       {!loading && filteredPackages.length === 0 && (
         <div style={emptyState}>No equipment found in this category.</div>
       )}
@@ -95,87 +126,142 @@ const PackageList: React.FC = () => {
   );
 };
 
-// --- Styles ---
-
 const containerStyle: React.CSSProperties = {
-  backgroundColor: "#f9fafb",
-  minHeight: "100vh",
-  padding: "60px 20px",
-  fontFamily: "'Outfit', sans-serif"
+  backgroundColor: "#f6f7f9",
+  minHeight: "calc(100vh - 64px)",
+  padding: "40px 20px 64px",
+  fontFamily: "Arial, sans-serif"
 };
 
-const headerStyle: React.CSSProperties = {
-  maxWidth: "1200px",
-  margin: "0 auto 40px auto",
-  textAlign: "center"
+const pageHeaderStyle: React.CSSProperties = {
+  maxWidth: "1120px",
+  margin: "0 auto 28px"
 };
 
-const backBtnStyle: React.CSSProperties = {
-  background: "none",
-  border: "none",
+const eyebrowStyle: React.CSSProperties = {
+  color: "#0f766e",
+  fontSize: "0.78rem",
+  fontWeight: 900,
+  letterSpacing: "0.08em",
+  margin: "0 0 10px",
+  textTransform: "uppercase"
+};
+
+const pageTitleStyle: React.CSSProperties = {
+  color: "#111827",
+  fontSize: "clamp(2rem, 4vw, 3rem)",
+  fontWeight: 900,
+  lineHeight: 1.05,
+  margin: "0 0 10px"
+};
+
+const pageSubtitleStyle: React.CSSProperties = {
   color: "#6b7280",
-  fontSize: "0.875rem",
-  fontWeight: "600",
-  cursor: "pointer",
-  marginBottom: "20px"
+  fontSize: "1rem",
+  lineHeight: 1.6,
+  margin: 0
 };
 
-const titleStyle: React.CSSProperties = { fontSize: "3rem", fontWeight: "800", color: "#111827", marginBottom: "12px" };
-const subtitleStyle: React.CSSProperties = { fontSize: "1.125rem", color: "#6b7280" };
-
-const filterContainer: React.CSSProperties = {
+const toolbarStyle: React.CSSProperties = {
+  maxWidth: "1120px",
+  margin: "0 auto 30px",
   display: "flex",
-  justifyContent: "center",
-  gap: "12px",
-  marginBottom: "48px",
-  flexWrap: "wrap"
+  flexWrap: "wrap",
+  gap: "14px",
+  alignItems: "center"
 };
 
-const filterBtn: React.CSSProperties = {
-  padding: "10px 20px",
-  borderRadius: "30px",
+const searchInputStyle: React.CSSProperties = {
+  flex: "1 1 320px",
+  minWidth: 0,
+  height: "48px",
+  border: "none",
+  borderRadius: "999px",
+  backgroundColor: "#fff",
+  boxShadow: "0 8px 22px rgba(15, 23, 42, 0.12)",
+  color: "#111827",
+  fontSize: "0.92rem",
+  outline: "none",
+  padding: "0 24px",
+  boxSizing: "border-box"
+};
+
+const selectStyle: React.CSSProperties = {
+  flex: "0 1 240px",
+  height: "46px",
+  borderRadius: "8px",
   border: "1px solid #e5e7eb",
   backgroundColor: "#fff",
+  boxShadow: "0 6px 16px rgba(15, 23, 42, 0.08)",
   color: "#374151",
-  fontWeight: "600",
-  fontSize: "0.875rem",
-  cursor: "pointer",
-  transition: "all 0.2s"
+  fontSize: "0.9rem",
+  outline: "none",
+  padding: "0 14px"
 };
 
-const activeFilterBtn: React.CSSProperties = {
-  ...filterBtn,
-  backgroundColor: "#111827",
-  color: "#fff",
-  borderColor: "#111827"
+const contentStyle: React.CSSProperties = {
+  maxWidth: "1120px",
+  margin: "0 auto",
+  backgroundColor: "#fff",
+  border: "1px solid #e5e7eb",
+  borderRadius: "6px",
+  boxShadow: "0 10px 28px rgba(15, 23, 42, 0.06)",
+  padding: "30px"
+};
+
+const sectionHeaderStyle: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: "16px",
+  marginBottom: "22px"
+};
+
+const titleStyle: React.CSSProperties = {
+  color: "#111827",
+  fontSize: "1.55rem",
+  fontWeight: 800,
+  margin: 0
+};
+
+const countStyle: React.CSSProperties = {
+  color: "#6b7280",
+  fontSize: "0.85rem",
+  fontWeight: 700
 };
 
 const gridStyle: React.CSSProperties = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
-  gap: "32px",
-  maxWidth: "1200px",
-  margin: "0 auto"
+  gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+  gap: "20px"
 };
 
 const cardStyle: React.CSSProperties = {
   backgroundColor: "#fff",
-  borderRadius: "24px",
+  borderRadius: "8px",
   overflow: "hidden",
-  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.05)",
-  border: "1px solid #f3f4f6",
-  transition: "transform 0.2s"
+  boxShadow: "0 6px 16px rgba(15, 23, 42, 0.1)",
+  border: "1px solid #eef0f3",
+  color: "inherit",
+  textDecoration: "none"
+};
+
+const imageWrapStyle: React.CSSProperties = {
+  height: "160px",
+  position: "relative",
+  backgroundColor: "#f3f4f6"
 };
 
 const imageStyle: React.CSSProperties = {
   width: "100%",
-  height: "220px",
+  height: "100%",
+  display: "block",
   objectFit: "cover"
 };
 
 const placeholderStyle: React.CSSProperties = {
   width: "100%",
-  height: "220px",
+  height: "100%",
   backgroundColor: "#f3f4f6",
   display: "flex",
   justifyContent: "center",
@@ -183,37 +269,63 @@ const placeholderStyle: React.CSSProperties = {
   color: "#9ca3af"
 };
 
-const cardInfo: React.CSSProperties = { padding: "24px" };
-
-const categoryBadge: React.CSSProperties = {
-  display: "inline-block",
-  padding: "4px 12px",
-  backgroundColor: "#f3f4f6",
-  color: "#6b7280",
-  fontSize: "0.75rem",
-  fontWeight: "700",
-  borderRadius: "20px",
-  textTransform: "uppercase",
-  marginBottom: "12px"
+const availabilityBadge: React.CSSProperties = {
+  position: "absolute",
+  top: "10px",
+  right: "10px",
+  backgroundColor: "#fff",
+  borderRadius: "5px",
+  boxShadow: "0 5px 14px rgba(15, 23, 42, 0.16)",
+  color: "#111827",
+  fontSize: "0.72rem",
+  fontWeight: 800,
+  padding: "6px 9px"
 };
 
-const pkgTitle: React.CSSProperties = { fontSize: "1.25rem", fontWeight: "700", color: "#111827", marginBottom: "16px", height: "1.5em", overflow: "hidden" };
+const cardInfo: React.CSSProperties = {
+  padding: "18px 18px 16px"
+};
 
-const priceRow: React.CSSProperties = { display: "flex", alignItems: "baseline", gap: "4px", marginBottom: "24px" };
-const priceText: React.CSSProperties = { fontSize: "1.5rem", fontWeight: "800", color: "#111827" };
-const perDay: React.CSSProperties = { fontSize: "0.875rem", color: "#6b7280" };
+const pkgTitle: React.CSSProperties = {
+  color: "#111827",
+  fontSize: "1.05rem",
+  fontWeight: 800,
+  lineHeight: 1.25,
+  minHeight: "2.6em",
+  margin: "0 0 10px"
+};
 
-const detailsBtn: React.CSSProperties = {
-  display: "block",
-  width: "100%",
-  padding: "14px",
-  backgroundColor: "#111827",
-  color: "#fff",
-  textAlign: "center",
-  textDecoration: "none",
-  borderRadius: "14px",
-  fontWeight: "700",
-  fontSize: "0.95rem"
+const descriptionStyle: React.CSSProperties = {
+  color: "#6b7280",
+  fontSize: "0.82rem",
+  lineHeight: 1.5,
+  height: "3.9em",
+  margin: "0 0 16px",
+  overflow: "hidden"
+};
+
+const cardFooterStyle: React.CSSProperties = {
+  alignItems: "center",
+  borderTop: "1px solid #f1f3f5",
+  display: "flex",
+  gap: "10px",
+  justifyContent: "space-between",
+  paddingTop: "12px"
+};
+
+const categoryText: React.CSSProperties = {
+  color: "#4b5563",
+  fontSize: "0.75rem",
+  fontWeight: 700,
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap"
+};
+
+const detailsText: React.CSSProperties = {
+  color: "#111827",
+  fontSize: "0.8rem",
+  fontWeight: 800
 };
 
 const msgBox: React.CSSProperties = { textAlign: "center", padding: "60px", color: "#6b7280" };
