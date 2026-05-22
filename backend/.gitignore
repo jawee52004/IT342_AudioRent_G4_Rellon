@@ -32,8 +32,8 @@ build/
 ### VS Code ###
 .vscode/
 
-# Firebase private keys
+# Firebase private keys — never commit this
 /src/main/resources/firebase-service-account.json
 
-/src/main/resources/application.properties
+# Local secrets — never commit this
 .env
