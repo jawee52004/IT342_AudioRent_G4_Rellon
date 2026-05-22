@@ -19,9 +19,9 @@ const RentalHistory: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const apiService = ApiService.getInstance();
 
   useEffect(() => {
+    const apiService = ApiService.getInstance();
     const fetchRentals = async () => {
       try {
         const response = await apiService.getAxiosInstance().get("/rentals");

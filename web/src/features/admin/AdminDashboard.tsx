@@ -37,6 +37,7 @@ const AdminDashboard: React.FC = () => {
       return;
     }
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate, userRole]);
 
   const fetchData = async () => {

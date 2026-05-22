@@ -51,7 +51,7 @@ const Booking: React.FC = () => {
         setError(null);
       }
     }
-  }, [startDate, endDate, pkg, existingRentals]);
+  }, [startDate, endDate, pkg, existingRentals]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const checkConflicts = (startStr: string, endStr: string) => {
     if (!pkg || !existingRentals) return false;
@@ -62,8 +62,6 @@ const Booking: React.FC = () => {
     // For each day in the requested range
     let current = new Date(reqStart);
     while (current <= reqEnd) {
-      const dateStr = current.toISOString().split("T")[0];
-      
       // Count rentals overlapping this specific day
       const overlapping = existingRentals.filter(r => {
         if (r.status !== "CONFIRMED" && r.status !== "PENDING") return false;

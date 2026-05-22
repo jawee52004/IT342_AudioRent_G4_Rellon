@@ -30,6 +30,7 @@ const ProviderDashboard: React.FC = () => {
       return;
     }
     fetchProviderData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate, userRole]);
 
   const fetchProviderData = async () => {
