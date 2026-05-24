@@ -46,7 +46,11 @@ public class UserRepository {
             return Optional.empty();
         }
 
-        User user = snapshot.getDocuments().get(0).toObject(User.class);
+        var doc = snapshot.getDocuments().get(0);
+        User user = doc.toObject(User.class);
+        if (user != null && user.getId() == null) {
+            user.setId(doc.getId());
+        }
         return Optional.ofNullable(user);
     }
 
@@ -64,7 +68,11 @@ public class UserRepository {
             return Optional.empty();
         }
 
-        return Optional.ofNullable(document.toObject(User.class));
+        User user = document.toObject(User.class);
+        if (user != null && user.getId() == null) {
+            user.setId(document.getId());
+        }
+        return Optional.ofNullable(user);
     }
 
     public List<User> findAll() throws ExecutionException, InterruptedException {
@@ -73,7 +81,10 @@ public class UserRepository {
         List<User> users = new ArrayList<>();
         snapshot.getDocuments().forEach(doc -> {
             User user = doc.toObject(User.class);
-            if (user != null) users.add(user);
+            if (user != null) {
+                if (user.getId() == null) user.setId(doc.getId());
+                users.add(user);
+            }
         });
         return users;
     }
